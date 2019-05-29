@@ -1,7 +1,7 @@
 const request = require('supertest')
 
 describe('the app', () => {
-  let mockHelloSchnaufRoute, app
+  let app
 
   beforeEach(() => {
     app = require('./app')

@@ -9,14 +9,14 @@ const managementPort = config.get('Server.managementPort')
 const startServer = async () => {
   const server = http.createServer(app)
   await promisify(server.listen.bind(server))(port)
-  console.log(`app server running on port ${port}`)
+  console.info(`app server running on port ${port}`)
   return server
 }
 
 const startManagementServer = async () => {
   const managementServer = http.createServer(managementApp)
   await promisify(managementServer.listen.bind(managementServer))(managementPort)
-  console.log(`management server running on port ${managementPort}`)
+  console.info(`management server running on port ${managementPort}`)
   return managementServer
 }
 
