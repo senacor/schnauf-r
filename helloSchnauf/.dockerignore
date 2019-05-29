@@ -1,0 +1,12 @@
+node_modules
+.next
+test
+spec
+build.git
+*.test.js
+*.testdata.js
+*.testdata.json.DS_Store
+integration-test/
+scripts
+build
+.env

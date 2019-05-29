@@ -1,0 +1,7 @@
+{
+  "Server": {
+    "port": 8080,
+    "managementPort": 8081,
+    "logLevel": "debug"
+  }
+}
