@@ -1,6 +1,7 @@
 package com.senacor.schnaufr.schnauf.query
 
 import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.UUIDAdapter
 import com.squareup.moshi.Moshi
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -35,11 +36,10 @@ class RSocketSchnaufQueryServer() {
 
 
         override fun requestStream(payload: Payload): Flowable<Payload> {
-            val moshi = Moshi.Builder().build();
-            val jsonAdapter = moshi.adapter(Schnauf::class.java)
+            val moshi = Moshi.Builder().add(UUIDAdapter).build();
+            val jsonAdapter = SchnaufJsonAdapter(moshi);
 
-
-            return Flowable.fromIterable(listOf(Schnauf(UUID(), "christoph", "schnauf"), Schnauf(UUID(), "mohmann", "schnauf2")))
+            return Flowable.fromIterable(listOf(Schnauf(UUID(), "christoph", "schnauf"), Schnauf(UUID(), "michael", "schnauf2")))
                     .map(jsonAdapter::toJson).map { DefaultPayload.text(it) };
 
 

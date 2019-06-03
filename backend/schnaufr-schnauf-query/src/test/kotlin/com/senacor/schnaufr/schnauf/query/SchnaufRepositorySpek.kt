@@ -8,7 +8,6 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
-import java.util.*
 
 class SchnaufRepositorySpek : Spek({
 
