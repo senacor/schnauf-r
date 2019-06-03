@@ -36,6 +36,7 @@ repositories {
     jcenter()
     maven { url "https://dl.bintray.com/spekframework/spek-dev" }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://oss.jfrog.org/oss-release-local' }
 }
 
 
@@ -59,6 +60,9 @@ dependencies {
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: logback_version
+
+    compile 'io.rsocket.kotlin:rsocket-core:0.9.6'
+    compile 'io.rsocket.kotlin:rsocket-transport-netty:0.9.6'
 
 
     //--------TEST---------------TEST---------------TEST---------------TEST---------------TEST---------------TEST-------
