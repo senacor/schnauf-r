@@ -1,11 +1,17 @@
 package com.senacor.schnaufr.schnauf.query
 
+import com.senacor.schnaufr.UUID
+import com.squareup.moshi.Moshi
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
 import io.rsocket.kotlin.util.AbstractRSocket
+import java.util.*
+import com.squareup.moshi.JsonAdapter
+
+
 
 class RSocketSchnaufQueryServer() {
 
@@ -29,8 +35,20 @@ class RSocketSchnaufQueryServer() {
     }
 
     private class MessageHandler: AbstractRSocket() {
+
+
+
         override fun requestStream(payload: Payload): Flowable<Payload> {
-            return Flowable.fromIterable(listOf(DefaultPayload.text("test-schnauf"), DefaultPayload.text("mohmann-schnauf")))
+            val moshi = Moshi.Builder().build();
+            val jsonAdapter = moshi.adapter(Schnauf::class.java)
+
+            Flowable.fromIterable(listOf(Schnauf(UUID(),"christoph", "schnauf" ), Schnauf(UUID(),"mohmann", "schnauf2" )))
+                    .map ( jsonAdapter::toJson )
+
+
+
+
+            return Flowable.fromIterable(listOf(DefaultPayload.text(), DefaultPayload.text("mohmann-schnauf")))
         }
     }
 }
