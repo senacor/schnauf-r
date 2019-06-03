@@ -40,6 +40,7 @@ class SchnauferAPISpek : Spek({
             schnaufer.close()
         }
 
+
         it("find user should return userNotFound for unknown user") {
 
             val rSocket: RSocket = RSocketFactory
