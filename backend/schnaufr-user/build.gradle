@@ -9,6 +9,7 @@ buildscript {
         logback_version = '1.2.3'
         typesafe_config_version = '1.3.4'
         kmongo_version = '3.10.2'
+        vertx_version = '3.7.1'
 
         spek_version = '2.0.5'
         junit_version = '5.4.2'
@@ -47,6 +48,8 @@ wrapper { //change gradleVersion and run `gw wrapper` to update
 }
 
 dependencies {
+    implementation group: 'io.vertx', name: 'vertx-core', version: vertx_version
+
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlin_version
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlin_version
 
@@ -127,9 +130,25 @@ test {
     }
 }
 
-// Naming and packaging settings for the "shadow jar".
+String mainClass = "com.senacor.schnaufr.Starter"
+String mainVerticle = "com.senacor.schnaufr.Bootstrap"
 shadowJar {
 //    minimize()
     archiveClassifier = 'fat'
+
+    manifest {
+        attributes('Main-Verticle': mainVerticle, 'Main-Class': mainClass)
+    }
 }
 
+task run(type: JavaExec, description: "run app with hot redeploy on localhost") {
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = mainClass
+
+    args = ['run', mainVerticle,
+            "--launcher-class=$mainClass",
+            "--redeploy=src/**/*.*",
+            "--on-redeploy=./gradlew classes"
+    ]
+}

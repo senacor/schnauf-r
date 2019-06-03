@@ -1,9 +1,7 @@
 package com.senacor.schnaufr.user
 
-import io.reactivex.Single
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
-import io.rsocket.kotlin.util.AbstractRSocket
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
@@ -28,7 +26,6 @@ class SchnauferAPISpek : Spek({
                 .transport(TcpClientTransport.create(9090))
                 .start()
                 .blockingGet()
-
 
             val response = rSocket.requestResponse(DefaultPayload.text("hi")).blockingGet()
 

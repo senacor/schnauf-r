@@ -1,7 +1,6 @@
 package com.senacor.schnaufr.user
 
 import io.reactivex.*
-import io.reactivex.disposables.Disposable
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.transport.netty.server.*
 import io.rsocket.kotlin.util.AbstractRSocket
@@ -10,25 +9,17 @@ import org.slf4j.LoggerFactory
 
 class SchnauferAPI {
 
-
     companion object {
         val logger = LoggerFactory.getLogger(SchnauferAPI::class.java)
     }
 
-    private lateinit var disposable: Disposable
-
-    fun setup() {
-        disposable = RSocketFactory
+    fun setup(): Single<NettyContextCloseable> {
+        return RSocketFactory
             .receive()
             .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
             .transport(TcpServerTransport.create(9090))
             .start()
-            .subscribe()
-
-    }
-
-    fun stop() {
-        disposable.dispose()
+            .doOnSuccess { logger.info("Server started") }
     }
 
     fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
@@ -37,8 +28,7 @@ class SchnauferAPI {
     }
 }
 
-class MessageHandler: AbstractRSocket() {
-
+class MessageHandler : AbstractRSocket() {
 
     companion object {
         val logger = LoggerFactory.getLogger(MessageHandler::class.java)
