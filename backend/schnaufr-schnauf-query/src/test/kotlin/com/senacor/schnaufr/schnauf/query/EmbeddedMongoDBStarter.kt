@@ -1,4 +1,4 @@
-package com.senacor.schnaufr.user
+package com.senacor.schnaufr.schnauf.query
 
 import com.mongodb.ConnectionString
 import com.mongodb.reactivestreams.client.MongoClient
