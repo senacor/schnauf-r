@@ -1,0 +1,129 @@
+buildscript {
+
+    ext {
+        kotlin_version = '1.3.31'
+        moshi_version = '1.8.0'
+        rxkotlin_version = '2.3.0'
+        rxjava_version = '2.2.9'
+        slf4j_version = '1.7.26'
+        logback_version = '1.2.3'
+        typesafe_config_version = '1.3.4'
+        kmongo_version = '3.10.2'
+
+        spek_version = '2.0.5'
+        junit_version = '5.4.2'
+        strikt_version = '0.20.1'
+        mockk_version = '1.9.3'
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+plugins {
+    id 'idea'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.31'
+    id 'org.jetbrains.kotlin.kapt' version '1.3.31'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+
+}
+
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://dl.bintray.com/spekframework/spek-dev" }
+    maven { url 'https://jitpack.io' }
+}
+
+
+wrapper { //change gradleVersion and run `gw wrapper` to update
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = '5.4.1'
+}
+
+dependencies {
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlin_version
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlin_version
+
+    implementation group: 'io.reactivex.rxjava2', name: 'rxkotlin', version: rxkotlin_version
+    implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: rxjava_version
+
+    implementation group: 'com.squareup.moshi', name: 'moshi-kotlin', version: moshi_version
+    kapt group: 'com.squareup.moshi', name: 'moshi-kotlin-codegen', version: moshi_version
+
+    implementation group: 'org.litote.kmongo', name: 'kmongo-async', version: kmongo_version
+    implementation group: 'org.litote.kmongo', name: 'kmongo-rxjava2', version: kmongo_version
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
+    runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: logback_version
+
+
+    //--------TEST---------------TEST---------------TEST---------------TEST---------------TEST---------------TEST-------
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junit_version
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junit_version
+
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek_version") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek_version") {
+        exclude group: 'org.junit.platform'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+    testImplementation group: 'io.mockk', name: 'mockk', version: mockk_version
+    testImplementation group: 'io.strikt', name: 'strikt-core', version: strikt_version
+
+    testImplementation group: "de.flapdoodle.embed", name: "de.flapdoodle.embed.mongo", version: "2.2.0"
+
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += ["-progressive", "-Xjvm-default=compatibility", "-XXLanguage:+InlineClasses"]
+        // these options are unsafe and not recommended for production use,
+        // "-XXLanguage:+NewInference", "-XXLanguage:+SamConversionForKotlinFunctions"
+    }
+}
+
+configurations {
+    all {
+        resolutionStrategy {
+            eachDependency { details ->
+                if (details.requested.name == 'kotlin-stdlib-jre8') { //jre
+                    //changing the name to jdk:
+                    details.useTarget group: details.requested.group, name: 'kotlin-stdlib-jdk8', version: details.requested.version
+                }
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines 'spek2'
+    }
+
+    minHeapSize = "128m"
+    maxHeapSize = "2048m"
+
+    jvmArgs '-XX:+UseG1GC'
+
+    testLogging {
+        exceptionFormat "full"
+        events "passed", "skipped", "failed"
+
+    }
+}
+
+// Naming and packaging settings for the "shadow jar".
+shadowJar {
+//    minimize()
+    archiveClassifier = 'fat'
+}
+
