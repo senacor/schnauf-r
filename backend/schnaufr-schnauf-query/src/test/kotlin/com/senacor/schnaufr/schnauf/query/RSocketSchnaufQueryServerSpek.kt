@@ -1,6 +1,5 @@
 package com.senacor.schnaufr.schnauf.query
 
-import com.squareup.moshi.Moshi
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
@@ -13,9 +12,6 @@ class RSocketSchnaufQueryServerSpek : Spek({
 
     describe("schnauf query server") {
         val sut = RSocketSchnaufQueryServer()
-        val moshi = Moshi.Builder().add(UUIDAdapter).build();
-        val schnaufJsonAdapter = SchnaufJsonAdapter(moshi);
-
 
 
         before {
