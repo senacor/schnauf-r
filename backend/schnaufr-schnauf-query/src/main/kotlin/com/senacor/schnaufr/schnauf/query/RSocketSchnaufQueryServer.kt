@@ -9,9 +9,7 @@ import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.Setup
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
 
-
 class RSocketSchnaufQueryServer() {
-
     private lateinit var disposable: Disposable;
 
     private fun createMongoClient(): MongoClient {
@@ -38,7 +36,5 @@ class RSocketSchnaufQueryServer() {
     fun stop() {
         disposable.dispose()
     }
-
-
 }
 
