@@ -1,29 +1,32 @@
 package com.senacor.schnaufr.schnauf
 
+import io.rsocket.kotlin.Closeable
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocket
 import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
-import org.litote.kmongo.reactivestreams.forEach
+import org.awaitility.Awaitility.await
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
-import strikt.assertions.hasSize
 import strikt.assertions.isEqualTo
+import java.util.concurrent.TimeUnit
 
 class RSocketServerSpek : Spek({
 
     describe("schnauf API") {
         val client by mongoDB(port = 27017)
         val repository by memoized { SchnaufRepository(client) }
-        val schnauferAPI by memoized { RSocketServer(repository) }
+        val rSocketServer by memoized { RSocketServer(repository) }
+
+        lateinit var closeable: Closeable
 
         before {
-            schnauferAPI.start()
+            closeable = rSocketServer.start().blockingGet()
         }
 
         after {
-            schnauferAPI.stop()
+            closeable.close()
         }
 
         it("should create new schnauf") {
@@ -35,18 +38,21 @@ class RSocketServerSpek : Spek({
 
             val response = rSocket.requestResponse(
                     DefaultPayload
-                            .text("""
-                                {"title": "first-schnauf"}
-                                """,
+                            .text(
                                     """
-                        {"operation": "createSchnauf"}
-                            """
+                                        {"title": "first-schnauf"}
+                                        """,
+                                    """
+                                        {"operation": "createSchnauf"}
+                                        """
                             )).blockingGet()
 
-            //expectThat(response.dataUtf8).isEqualTo("huhu")
-            val allSchnaufs = repository.readAll().toList().blockingGet()
-            expectThat(allSchnaufs).hasSize(1)
-        }
+            expectThat(response.dataUtf8).isEqualTo("huhu")
 
+            await().atMost(5, TimeUnit.SECONDS).until {
+                val allSchnaufs = repository.readAll().toList().blockingGet()
+                allSchnaufs.size == 1
+            }
+        }
     }
 })
