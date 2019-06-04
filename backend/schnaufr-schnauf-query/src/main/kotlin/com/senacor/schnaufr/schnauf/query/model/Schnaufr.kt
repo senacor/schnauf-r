@@ -1,9 +1,10 @@
-package com.senacor.schnaufr.user
+package com.senacor.schnaufr.schnauf.query.model
 
 import com.senacor.schnaufr.serialization.JsonSerializer
 import com.squareup.moshi.JsonClass
-import io.rsocket.kotlin.*
-import java.util.UUID
+import io.rsocket.kotlin.DefaultPayload
+import io.rsocket.kotlin.Payload
+import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class Schnaufer(val id: UUID, val avatarId: UUID, val username: String, val displayName: String) {
