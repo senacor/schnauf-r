@@ -53,7 +53,7 @@ class RSocketServerSpek : Spek({
             expectThat(response.dataUtf8).isEqualTo("huhu")
 
             await().atMost(5, TimeUnit.SECONDS).until {
-                !repository.readAll().toList().blockingGet().isEmpty()
+                repository.readLatest().toList().blockingGet().isNotEmpty()
             }
         }
 

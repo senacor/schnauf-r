@@ -2,6 +2,7 @@ package com.senacor.schnaufr.schnauf
 
 import com.senacor.schnaufr.model.CreateSchnaufRequest
 import com.senacor.schnaufr.model.RSocketMetadata
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.rsocket.kotlin.*
@@ -35,9 +36,29 @@ class RSocketServer(private val schnaufRepository: SchnaufRepository) {
                 val metadata = RSocketMetadata.fromJson(payload.metadataUtf8)
 
                 if (metadata.operation == "getAllSchnaufs") {
-                    return schnaufRepository.readAll()
+                    return schnaufRepository
+                            .readLatest()
                             .map { it.asPayload() }
                 }
+
+                if (metadata.operation == "watchSchnaufs") {
+                    return schnaufRepository
+                            .watch()
+                            .toFlowable(BackpressureStrategy.BUFFER)
+                            .map { it.asPayload() }
+                }
+
+                if (metadata.operation == "getAllSchnaufsAndWatch") {
+                    return schnaufRepository
+                            .readLatest()
+                            .flatMap {
+                                schnaufRepository
+                                        .watch()
+                                        .toFlowable(BackpressureStrategy.BUFFER)
+                            }
+                            .map { it.asPayload() }
+                }
+
                 return Flowable.just(DefaultPayload.text("bla"))
             }
         })

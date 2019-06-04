@@ -133,3 +133,9 @@ application {
 shadowJar {
     archiveClassifier = 'fat'
 }
+
+jib {
+    container {
+        environment = [ MONGO_HOST: 'mongo0' ]
+    }
+}

@@ -27,10 +27,11 @@ object Bootstrap {
         })
 
         executor.execute {
-            logger.info("Starting application")
-            logger.info("Connecting to ${System.getenv("MONGO_HOST")}")
+            val mongoConnectionString = "mongodb://${System.getenv("MONGO_HOST")}:27017"
+
+            logger.info("Starting application, connecting to MongoDB at $mongoConnectionString")
             disposable =
-                    RSocketServer(SchnaufRepository(KMongo.createClient(ConnectionString("mongodb://mongo:27017"))))
+                    RSocketServer(SchnaufRepository(KMongo.createClient(ConnectionString(mongoConnectionString))))
                             .start()
                             .subscribeBy { logger.info("Application started") }
 
