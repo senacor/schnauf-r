@@ -22,6 +22,7 @@ class RSocketSchnaufQueryServer() {
 
     fun start(): Single<NettyContextCloseable> {
         // ToDo: Start Clients
+        schnaufrClient.start();
 
         return RSocketFactory
                 .receive()
@@ -33,6 +34,8 @@ class RSocketSchnaufQueryServer() {
 
     fun stop() {
         // ToDo: Stop Clients
+        schnaufrClient.start();
+
     }
 }
 

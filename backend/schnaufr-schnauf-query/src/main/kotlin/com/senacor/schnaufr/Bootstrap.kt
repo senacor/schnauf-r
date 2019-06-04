@@ -28,9 +28,9 @@ object Bootstrap {
         executor.execute {
             logger.info("Starting application")
             disposable =
-                rSocketSchnaufQueryServer
-                .start()
-                .subscribeBy { logger.info("Application started") }
+                    rSocketSchnaufQueryServer
+                            .start()
+                            .subscribeBy { logger.info("Application started") }
 
             Thread.currentThread().join()
         }
