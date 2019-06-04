@@ -12,7 +12,7 @@ import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import java.util.UUID
 
-class SchnauferAPISpek : Spek({
+class SchnauferSpek : Spek({
 
     describe("schnaufer API") {
         val client by mongoDB(port = 27017)
