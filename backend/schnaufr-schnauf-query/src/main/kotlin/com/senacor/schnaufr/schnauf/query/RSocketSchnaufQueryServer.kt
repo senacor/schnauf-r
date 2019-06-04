@@ -10,9 +10,7 @@ import io.rsocket.kotlin.*
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
 import io.rsocket.kotlin.util.AbstractRSocket
 
-
 class RSocketSchnaufQueryServer() {
-
     private lateinit var disposable: Disposable;
 
     private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
@@ -33,16 +31,12 @@ class RSocketSchnaufQueryServer() {
     }
 
     private class MessageHandler : AbstractRSocket() {
-
-
         override fun requestStream(payload: Payload): Flowable<Payload> {
             val moshi = Moshi.Builder().add(UUIDAdapter).build();
             val jsonAdapter = SchnaufJsonAdapter(moshi);
 
             return Flowable.fromIterable(listOf(Schnauf(UUID(), "christoph", "schnauf"), Schnauf(UUID(), "michael", "schnauf2")))
                     .map(jsonAdapter::toJson).map { DefaultPayload.text(it) };
-
-
         }
     }
 }
