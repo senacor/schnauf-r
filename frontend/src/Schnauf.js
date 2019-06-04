@@ -1,10 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Schnauf = ({reason}) => <h1>{reason + '-schnauf'}</h1>;
+const Schnauf = ({schnauf}) => <div>
+  <span className="mdl-list__item-primary-content">
+    <span>{schnauf.title}</span>
+  </span>
+  <span className="mdl-list__item-secondary-content">
+    <span className="mdl-list__item-secondary-info">{schnauf.author.displayName}</span>
+  </span>
+</div>;
 
 Schnauf.propTypes = {
-  reason: PropTypes.string.isRequired
+  schnauf: PropTypes.object.isRequired
 };
 
 export default Schnauf;
