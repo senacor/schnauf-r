@@ -1,5 +1,6 @@
 package com.senacor.schnaufr.user
 
+import com.senacor.schnaufr.UUID
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.exceptions.ApplicationException
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
@@ -7,10 +8,8 @@ import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
 import org.litote.kmongo.rxjava2.blockingAwait
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import strikt.api.expectThat
-import strikt.api.expectThrows
-import strikt.assertions.isEqualTo
-import java.util.UUID
+import strikt.api.*
+import strikt.assertions.*
 
 class SchnauferSpek : Spek({
 
@@ -22,69 +21,63 @@ class SchnauferSpek : Spek({
             database.createCollection("schnaufers").blockingAwait()
         }
 
-
         val schnauferRepository = SchnauferRepository(client)
 
         val sut = SchnauferServer(MessageHandler(schnauferRepository))
 
-        lateinit var schnaufer: NettyContextCloseable
-
         before {
-            schnaufer = sut.setup().blockingGet()
+            sut.setup().blockingGet()
         }
 
         after {
-            schnaufer.close()
+
+
         }
 
-
-        it("find user should return userNotFound for unknown user") {
-
-            val rSocket: RSocket = RSocketFactory
+        val rSocket: RSocket by lazy {
+            RSocketFactory
                 .connect()
                 .transport(TcpClientTransport.create(9090))
                 .start()
                 .blockingGet()
+        }
 
-            val findUserPayload = DefaultPayload.text("matzeP", "findUser")
-            expectThrows<ApplicationException>() {
-                rSocket.requestResponse(findUserPayload).blockingGet()
+        context("when a user is requested by id") {
+
+            it("it return 'userNotFound' for unknown user") {
+                val findUserPayload = DefaultPayload.text(UUID().toString(), """{"operation": "findUserById"}""")
+
+                expectThrows<ApplicationException> {
+                    rSocket.requestResponse(findUserPayload).blockingGet()
+                }.message.isEqualTo("userNotFound")
+            }
+
+            it("returns a schnaufer") {
+                val schnaufer = Schnaufer(
+                    id = UUID(),
+                    avatarId = UUID(),
+                    username = "schnauferusername",
+                    displayName = "screenSchnaufer"
+                )
+
+                schnauferRepository.create(schnaufer).blockingGet()
+
+                val requestPayload = DefaultPayload.text(schnaufer.id.toString(), """{"operation": "findUserById"}""")
+                val response = rSocket.requestResponse(requestPayload).blockingGet()
+                val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
+                expectThat(foundSchnaufer).isEqualTo(schnaufer)
             }
         }
 
-        it("should return empty for unknown user") {
-            val rSocket: RSocket = RSocketFactory
-                .connect()
-                .transport(TcpClientTransport.create(9090))
-                .start()
-                .blockingGet()
+        context("when a user is requested by username") {
 
-            val unknownUUID = UUID.randomUUID()
-            val findUserPayload = DefaultPayload.text(unknownUUID.toString(), "findUser")
-            val response = rSocket.requestResponse(findUserPayload).blockingGet()
-            expectThat(response.dataUtf8).isEqualTo("userNotFound")
-        }
+            it("should return empty for unknown user") {
+                val findUserPayload = DefaultPayload.text("Hermann", """{"operation": "findUserByUsername"}""")
 
-        it("should return schnaufer") {
-            val schnaufer = Schnaufer(
-                id = UUID.randomUUID(),
-                avatarId = UUID.randomUUID(),
-                username = "schnauferusername",
-                displayName = "screenSchnaufer"
-            )
-
-            schnauferRepository.create(schnaufer).blockingGet()
-
-            val rSocket: RSocket = RSocketFactory
-                .connect()
-                .transport(TcpClientTransport.create(9090))
-                .start()
-                .blockingGet()
-
-            val requestPayload = DefaultPayload.text(schnaufer.id.toString(), "findUser")
-            val response = rSocket.requestResponse(requestPayload).blockingGet()
-            val foundSchnaufer = response.dataUtf8
-            expectThat(foundSchnaufer).isEqualTo(schnaufer.toString())
+                expectThrows<ApplicationException> {
+                    rSocket.requestResponse(findUserPayload).blockingGet()
+                }.message.isEqualTo("userNotFound")
+            }
         }
 
     }

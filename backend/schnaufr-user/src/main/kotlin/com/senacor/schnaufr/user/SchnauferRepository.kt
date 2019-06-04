@@ -8,11 +8,12 @@ import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsy
 import io.reactivex.*
 import org.bson.Document
 import org.litote.kmongo.eq
-import org.litote.kmongo.reactivestreams.getCollection
+import org.litote.kmongo.reactivestreams.*
 import org.litote.kmongo.rxjava2.*
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.util.UUID
+import javax.print.attribute.standard.JobOriginatingUserName
 
 class SchnauferRepository(private val client: MongoClient) {
 
@@ -31,7 +32,15 @@ class SchnauferRepository(private val client: MongoClient) {
     }
 
     fun read(id: UUID): Maybe<Schnaufer> {
+
+        collection.watchIndefinitely {  }
         return collection.findOne(Schnaufer::id eq id)
+            .doOnSubscribe { logger.info("Looking up user id '$id' in MongoDB") }
+    }
+
+    fun readByUsername(userName: String): Maybe<Schnaufer> {
+        return collection.findOne(Schnaufer::username eq userName)
+            .doOnSubscribe { logger.info("Looking up user with name '$userName' in MongoDB") }
     }
 
     fun saveAvatar(schnauferId: UUID, data: InputStream): Completable {
