@@ -7,10 +7,10 @@ import io.rsocket.kotlin.Payload
 import java.util.*
 
 @JsonClass(generateAdapter = true)
-data class Schnaufer(val id: UUID, val avatarId: UUID, val username: String, val displayName: String) {
+data class Schnaufr(val id: UUID, val avatarId: UUID, val username: String, val displayName: String) {
 
     companion object {
-        fun fromJson(value: String): Schnaufer = JsonSerializer.fromJson(value)
+        fun fromJson(value: String): Schnaufr = JsonSerializer.fromJson(value)
     }
 
     fun toJson(): String = JsonSerializer.toJsonString(this)
