@@ -5,9 +5,7 @@ import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.Payload
 import java.util.*
 
-
-// author: User / ID and probably geoloaction or something like that
-data class Schnauf(val id: UUID, val submitter: UUID, val title: String) {
+data class Author(val avatarId: UUID, val username: String, val displayName: String) {
     fun toJson(): String = JsonSerializer.toJsonString(this)
 
     fun asPayload(): Payload {
