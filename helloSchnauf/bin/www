@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+require('clarify')
+require('../src/startup')()
