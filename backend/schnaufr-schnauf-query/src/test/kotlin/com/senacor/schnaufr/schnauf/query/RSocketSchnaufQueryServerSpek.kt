@@ -1,6 +1,5 @@
 package com.senacor.schnaufr.schnauf.query
 
-import com.senacor.schnaufr.UUIDAdapter
 import com.squareup.moshi.Moshi
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocketFactory
