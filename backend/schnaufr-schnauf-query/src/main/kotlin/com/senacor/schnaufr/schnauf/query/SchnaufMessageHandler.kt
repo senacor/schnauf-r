@@ -18,4 +18,6 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnaufrClient
         return schnaufClient.getAllSchnaufs()
                 .map(SchnaufMessageHandler.schnaufJsonAdapter::toJson).map { DefaultPayload.text(it) };
     }
+
+
 }
