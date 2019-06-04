@@ -26,7 +26,7 @@ class RSocketServer(private val schnaufRepository: SchnaufRepository) {
                     val schnaufRequest = CreateSchnaufRequest.fromJson(payload.dataUtf8)
                     return schnaufRepository
                             .create(Schnauf.fromRequest(schnaufRequest))
-                            .map { DefaultPayload.text("huhu") }
+                            .map { it.asPayload() }
                 }
 
                 return Single.just(DefaultPayload.text("bla"))
@@ -51,11 +51,11 @@ class RSocketServer(private val schnaufRepository: SchnaufRepository) {
                 if (metadata.operation == "getAllSchnaufsAndWatch") {
                     return schnaufRepository
                             .readLatest()
-                            .flatMap {
+                            .concatWith(
                                 schnaufRepository
                                         .watch()
                                         .toFlowable(BackpressureStrategy.BUFFER)
-                            }
+                            )
                             .map { it.asPayload() }
                 }
 
