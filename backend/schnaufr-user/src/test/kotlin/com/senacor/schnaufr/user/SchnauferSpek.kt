@@ -18,8 +18,6 @@ class SchnauferSpek : Spek({
         val client by mongoDB(port = 27017)
         val database by lazy { client.getDatabase("schnauf") }
 
-        val sut by memoized { SchnauferRepository(client) }
-
         before {
             database.createCollection("schnaufers").blockingAwait()
         }
@@ -27,11 +25,12 @@ class SchnauferSpek : Spek({
 
         val schnauferRepository = SchnauferRepository(client)
 
-        val schnauferAPI = SchnauferServer(MessageHandler(schnauferRepository))
+        val sut = SchnauferServer(MessageHandler(schnauferRepository))
 
         lateinit var schnaufer: NettyContextCloseable
+
         before {
-            schnaufer = schnauferAPI.setup().blockingGet()
+            schnaufer = sut.setup().blockingGet()
         }
 
         after {
@@ -67,8 +66,13 @@ class SchnauferSpek : Spek({
         }
 
         it("should return schnaufer") {
-            val schnaufer =
-                Schnaufer(UUID.randomUUID(), UUID.randomUUID(), "schnauferusername", "screenSchnaufer")
+            val schnaufer = Schnaufer(
+                id = UUID.randomUUID(),
+                avatarId = UUID.randomUUID(),
+                username = "schnauferusername",
+                displayName = "screenSchnaufer"
+            )
+
             schnauferRepository.create(schnaufer).blockingGet()
 
             val rSocket: RSocket = RSocketFactory
