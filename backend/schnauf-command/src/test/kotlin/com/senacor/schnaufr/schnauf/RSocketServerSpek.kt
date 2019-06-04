@@ -40,7 +40,7 @@ class RSocketServerSpek : Spek({
                     DefaultPayload
                             .text(
                                     """
-                                        {"title": "first-schnauf"}
+                                        {"title": "first-schnauf", "submitter": "darth vader"}
                                         """,
                                     """
                                         {"operation": "createSchnauf"}
