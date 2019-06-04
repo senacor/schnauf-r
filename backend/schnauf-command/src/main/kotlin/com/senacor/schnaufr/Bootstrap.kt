@@ -1,7 +1,8 @@
 package com.senacor.schnaufr
 
 import com.mongodb.ConnectionString
-import com.senacor.schnaufr.user.*
+import com.senacor.schnaufr.schnauf.RSocketServer
+import com.senacor.schnaufr.schnauf.SchnaufRepository
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import org.litote.kmongo.reactivestreams.KMongo
@@ -27,16 +28,11 @@ object Bootstrap {
 
         executor.execute {
             logger.info("Starting application")
+            logger.info("Connecting to ${System.getenv("MONGO_HOST")}")
             disposable =
-                SchnauferServer(
-                    MessageHandler(
-                        SchnauferRepository(
-                            KMongo.createClient(ConnectionString("mongodb://localhost:27017"))
-                        )
-                    )
-                )
-                    .setup()
-                    .subscribeBy { logger.info("Application started") }
+                    RSocketServer(SchnaufRepository(KMongo.createClient(ConnectionString("mongodb://mongo:27017"))))
+                            .start()
+                            .subscribeBy { logger.info("Application started") }
 
             Thread.currentThread().join()
         }

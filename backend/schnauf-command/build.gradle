@@ -26,8 +26,9 @@ plugins {
     id 'idea'
     id 'org.jetbrains.kotlin.jvm' version '1.3.31'
     id 'org.jetbrains.kotlin.kapt' version '1.3.31'
+    id 'application'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
-
+    id 'com.google.cloud.tools.jib' version '1.2.0'
 }
 
 
@@ -125,9 +126,10 @@ test {
     }
 }
 
-// Naming and packaging settings for the "shadow jar".
-shadowJar {
-//    minimize()
-    archiveClassifier = 'fat'
+application {
+    mainClassName = 'com.senacor.schnaufr.Bootstrap'
 }
 
+shadowJar {
+    archiveClassifier = 'fat'
+}

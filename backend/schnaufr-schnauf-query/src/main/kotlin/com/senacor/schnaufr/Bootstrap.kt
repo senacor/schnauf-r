@@ -1,10 +1,8 @@
 package com.senacor.schnaufr
 
-import com.mongodb.ConnectionString
-import com.senacor.schnaufr.user.*
+import com.senacor.schnaufr.schnauf.query.RSocketSchnaufQueryServer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import org.litote.kmongo.reactivestreams.KMongo
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
@@ -12,6 +10,7 @@ object Bootstrap {
 
     val logger = LoggerFactory.getLogger(Bootstrap::class.java)
     var disposable: Disposable? = null
+    val rSocketSchnaufQueryServer = RSocketSchnaufQueryServer()
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -20,6 +19,7 @@ object Bootstrap {
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 disposable?.dispose()
+                rSocketSchnaufQueryServer.stop()
                 executor.shutdownNow()
                 logger.info("Application stopped")
             }
@@ -28,15 +28,9 @@ object Bootstrap {
         executor.execute {
             logger.info("Starting application")
             disposable =
-                SchnauferServer(
-                    MessageHandler(
-                        SchnauferRepository(
-                            KMongo.createClient(ConnectionString("mongodb://localhost:27017"))
-                        )
-                    )
-                )
-                    .setup()
-                    .subscribeBy { logger.info("Application started") }
+                    rSocketSchnaufQueryServer
+                            .start()
+                            .subscribeBy { logger.info("Application started") }
 
             Thread.currentThread().join()
         }

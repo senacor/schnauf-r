@@ -1,27 +1,18 @@
 package com.senacor.schnaufr.user
 
 import com.mongodb.BasicDBObject
-import com.mongodb.async.SingleResultCallback
-import com.mongodb.async.client.gridfs.helpers.AsynchronousChannelHelper
 import com.mongodb.client.gridfs.model.*
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
-import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
 import io.reactivex.*
 import org.bson.Document
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.getCollection
 import org.litote.kmongo.rxjava2.*
-import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
-import java.util.UUID
-import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
-import org.bson.conversions.Bson
 import java.io.InputStream
-import java.nio.channels.*
-import java.nio.file.StandardOpenOption
-import java.time.Instant
+import java.util.UUID
 
 class SchnauferRepository(private val client: MongoClient) {
 
@@ -45,7 +36,6 @@ class SchnauferRepository(private val client: MongoClient) {
 
     fun saveAvatar(schnauferId: UUID, data: InputStream): Completable {
 
-
         val options = GridFSUploadOptions()
             .chunkSizeBytes(1024 * 1024)
             .metadata(Document("schnauferId", schnauferId))
@@ -63,7 +53,6 @@ class SchnauferRepository(private val client: MongoClient) {
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
-         return bucket.find(whereQuery).maybe()
-
+        return bucket.find(whereQuery).maybe()
     }
 }

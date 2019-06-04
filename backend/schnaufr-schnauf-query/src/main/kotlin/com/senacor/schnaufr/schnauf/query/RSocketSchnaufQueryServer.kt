@@ -1,39 +1,41 @@
 package com.senacor.schnaufr.schnauf.query
 
 import io.reactivex.Single
-import io.reactivex.disposables.Disposable
 import io.rsocket.kotlin.RSocket
 import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.Setup
+import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
+import org.slf4j.LoggerFactory
 
 class RSocketSchnaufQueryServer() {
-    private lateinit var disposable: Disposable;
-
-
-    private fun createSchnaufClient(): SchnaufClient {
-        return SchnaufClient();
+    companion object {
+        val logger = LoggerFactory.getLogger(RSocketSchnaufQueryServer::class.java)
     }
 
-    private fun createSchnaufrClient(): SchnaufrClient {
-        return SchnaufrClient();
-    }
+    private val schnaufrClient = SchnaufrClient()
+    private val schnaufClient = SchnaufClient()
 
     private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
-        return Single.just(SchnaufMessageHandler(createSchnaufClient(), createSchnaufrClient()))
+        return Single.just(SchnaufMessageHandler(schnaufClient, schnaufrClient))
     }
 
-    fun start() {
-        disposable = RSocketFactory
+    fun start(): Single<NettyContextCloseable> {
+        // ToDo: Start Clients
+        schnaufrClient.start();
+
+        return RSocketFactory
                 .receive()
                 .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
                 .transport(TcpServerTransport.create(8080))  // Netty websocket transport
                 .start()
-                .subscribe()
+                .doOnSuccess { logger.info("Server started") }
     }
 
     fun stop() {
-        disposable.dispose()
+        // ToDo: Stop Clients
+        schnaufrClient.start();
+
     }
 }
 

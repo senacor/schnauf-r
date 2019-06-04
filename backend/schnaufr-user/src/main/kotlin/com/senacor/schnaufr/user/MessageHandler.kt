@@ -1,37 +1,11 @@
 package com.senacor.schnaufr.user
 
 import io.reactivex.*
-import io.reactivex.disposables.Disposable
 import io.rsocket.kotlin.*
-import io.rsocket.kotlin.transport.netty.server.*
 import io.rsocket.kotlin.util.AbstractRSocket
 import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import java.util.UUID
-
-class SchnauferAPI(
-    private val repository: SchnauferRepository
-) {
-
-    companion object {
-        val logger = LoggerFactory.getLogger(SchnauferAPI::class.java)
-        const val FIND_USER_COMMAND = "findUser"
-    }
-
-    fun setup(): Single<NettyContextCloseable> {
-        return RSocketFactory
-            .receive()
-            .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
-            .transport(TcpServerTransport.create(9090))
-            .start()
-            .doOnSuccess { logger.info("Server started") }
-    }
-
-    fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
-        logger.info("received setup {}", setup)
-        return Single.just(MessageHandler(repository))
-    }
-}
 
 class MessageHandler(
     private val repository: SchnauferRepository
@@ -46,7 +20,7 @@ class MessageHandler(
 
         val command = payload.metadataUtf8
 
-        if (command.equals(SchnauferAPI.FIND_USER_COMMAND)) {
+        if (command.equals(SchnauferServer.FIND_USER_COMMAND)) {
             logger.info("Looking up user in DB")
             try {
                 val userId = UUID.fromString(payload.dataUtf8)

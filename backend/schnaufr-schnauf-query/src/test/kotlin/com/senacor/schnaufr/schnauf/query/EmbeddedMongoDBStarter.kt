@@ -2,13 +2,17 @@ package com.senacor.schnaufr.schnauf.query
 
 import com.mongodb.ConnectionString
 import com.mongodb.reactivestreams.client.MongoClient
-import de.flapdoodle.embed.mongo.*
+import de.flapdoodle.embed.mongo.Command
+import de.flapdoodle.embed.mongo.MongodExecutable
+import de.flapdoodle.embed.mongo.MongodProcess
+import de.flapdoodle.embed.mongo.MongodStarter
 import de.flapdoodle.embed.mongo.config.*
 import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.extract.UserTempNaming
 import de.flapdoodle.embed.process.runtime.Network
 import org.litote.kmongo.reactivestreams.KMongo
-import org.spekframework.spek2.lifecycle.*
+import org.spekframework.spek2.lifecycle.CachingMode
+import org.spekframework.spek2.lifecycle.MemoizedValue
 import org.spekframework.spek2.style.specification.Suite
 
 
