@@ -21,11 +21,11 @@ class SchnauferRepositorySpek : Spek({
         }
 
         it("can read schnaufers") {
-            val schaufer = Schnaufer(id = UUID(), name = "Michael")
+            val schaufer = Schnaufer(id = UUID(), avatarId = UUID(), username = "momann", displayName = "Moni")
             sut.create(schaufer).blockingGet()
 
             val result = sut.read(schaufer.id).blockingGet()
-            expectThat(result.name).isEqualTo("Michael")
+            expectThat(result.displayName).isEqualTo("Moni")
         }
 
         it("can read avatars") {
