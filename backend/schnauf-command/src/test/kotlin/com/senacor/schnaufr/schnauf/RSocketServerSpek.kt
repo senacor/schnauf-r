@@ -50,8 +50,7 @@ class RSocketServerSpek : Spek({
             expectThat(response.dataUtf8).isEqualTo("huhu")
 
             await().atMost(5, TimeUnit.SECONDS).until {
-                val allSchnaufs = repository.readAll().toList().blockingGet()
-                allSchnaufs.size == 1
+                !repository.readAll().toList().blockingGet().isEmpty()
             }
         }
     }

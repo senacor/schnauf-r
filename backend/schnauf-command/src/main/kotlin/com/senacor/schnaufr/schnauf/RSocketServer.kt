@@ -29,9 +29,11 @@ class RSocketServer(private val schnaufRepository: SchnaufRepository) {
                 if (metadata.operation == "createSchnauf") {
                     val schnaufRequestAdapter = moshi.adapter(CreateSchnaufRequest::class.java)
                     val schnaufRequest = schnaufRequestAdapter.fromJson(payload.dataUtf8)!!
-                    schnaufRepository.create(Schnauf.fromRequest(schnaufRequest))
+                    return schnaufRepository.create(Schnauf.fromRequest(schnaufRequest))
+                            .map { DefaultPayload.text("huhu") }
                 }
-                return Single.just(DefaultPayload.text("huhu"))
+
+                return Single.just(DefaultPayload.text("bla"))
             }
         })
     }
