@@ -4,7 +4,6 @@ import com.senacor.schnaufr.UUID
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.exceptions.ApplicationException
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
-import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
 import org.litote.kmongo.rxjava2.blockingAwait
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -23,15 +22,16 @@ class SchnauferSpek : Spek({
 
         val schnauferRepository = SchnauferRepository(client)
 
-        val sut = SchnauferServer(MessageHandler(schnauferRepository))
+        val server = SchnauferServer(MessageHandler(schnauferRepository))
+
+        lateinit var closeable: Closeable
 
         before {
-            sut.setup().blockingGet()
+            closeable = server.setup().blockingGet()
         }
 
         after {
-
-
+            closeable.close()
         }
 
         val rSocket: RSocket by lazy {
