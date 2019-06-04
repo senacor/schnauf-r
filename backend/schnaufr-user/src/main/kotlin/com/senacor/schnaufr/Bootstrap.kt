@@ -1,32 +1,45 @@
 package com.senacor.schnaufr
 
-import com.senacor.schnaufr.user.SchnauferAPI
-import com.senacor.schnaufr.user.SchnauferRepository
+import com.mongodb.ConnectionString
+import com.senacor.schnaufr.user.*
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.vertx.core.*
-import io.vertx.core.logging.LoggerFactory
+import org.litote.kmongo.reactivestreams.KMongo
+import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
 
-class Bootstrap(
-    private val schnauferRepository: SchnauferRepository
-) : AbstractVerticle() {
+object Bootstrap {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger("Bootstrap")
-    }
+    val logger = LoggerFactory.getLogger(Bootstrap::class.java)
+    var disposable: Disposable? = null
 
-    private lateinit var closable: io.rsocket.kotlin.Closeable
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val executor = Executors.newSingleThreadExecutor()
 
-    override fun start(startFuture: Future<Void>) {
-        SchnauferAPI(schnauferRepository).setup().subscribeBy(
-            onSuccess = {
-                closable = it
-                startFuture.complete()
-            },
-            onError = { startFuture.fail(it) }
-        )
-    }
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            override fun run() {
+                disposable?.dispose()
+                logger.info("Starting stopped")
+                executor.shutdownNow()
+                logger.info("Starting stopped")
+            }
+        })
 
-    override fun stop(stopFuture: Future<Void>) {
-        closable.close().subscribe { stopFuture.complete() }
+        executor.execute {
+            logger.info("Starting application")
+            disposable =
+                SchnauferServer(
+                    MessageHandler(
+                        SchnauferRepository(
+                            KMongo.createClient(ConnectionString("mongodb://localhost:27017"))
+                        )
+                    )
+                )
+                    .setup()
+                    .subscribeBy { logger.info("Application started") }
+
+            Thread.currentThread().join()
+        }
     }
 }

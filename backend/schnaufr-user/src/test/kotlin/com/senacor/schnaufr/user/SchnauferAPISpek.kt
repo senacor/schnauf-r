@@ -1,11 +1,9 @@
 package com.senacor.schnaufr.user
 
-import io.reactivex.Single
 import io.rsocket.kotlin.*
 import io.rsocket.kotlin.exceptions.ApplicationException
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
 import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
-import io.rsocket.kotlin.util.AbstractRSocket
 import org.litote.kmongo.rxjava2.blockingAwait
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -29,7 +27,7 @@ class SchnauferAPISpek : Spek({
 
         val schnauferRepository = SchnauferRepository(client)
 
-        val schnauferAPI = SchnauferAPI(schnauferRepository)
+        val schnauferAPI = SchnauferServer(MessageHandler(schnauferRepository))
 
         lateinit var schnaufer: NettyContextCloseable
         before {
