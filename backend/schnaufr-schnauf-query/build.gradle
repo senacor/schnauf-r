@@ -132,7 +132,7 @@ shadowJar {
 
 jib {
     to {
-        image = "gcr.io/schnaufer/query-schnauf"
+        image = "gcr.io/main-stack-241307/query-schnauf:latest"
     }
 }
 
