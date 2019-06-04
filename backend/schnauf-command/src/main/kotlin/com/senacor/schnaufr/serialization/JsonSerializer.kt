@@ -1,4 +1,4 @@
-package com.senacor.schnaufr
+package com.senacor.schnaufr.serialization
 
 import com.squareup.moshi.Moshi
 import org.slf4j.LoggerFactory
@@ -7,7 +7,7 @@ object JsonSerializer {
 
     val logger = LoggerFactory.getLogger("JsonSerializer")
 
-    val moshi: Moshi = Moshi.Builder().build()
+    val moshi: Moshi = Moshi.Builder().add(UUIDAdapter).build()
 
     inline fun <reified T> fromJson(json: String): T {
         if (json.isBlank()) {

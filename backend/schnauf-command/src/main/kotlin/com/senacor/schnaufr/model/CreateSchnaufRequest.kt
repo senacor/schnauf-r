@@ -1,6 +1,6 @@
 package com.senacor.schnaufr.model
 
-import com.senacor.schnaufr.JsonSerializer
+import com.senacor.schnaufr.serialization.JsonSerializer
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
