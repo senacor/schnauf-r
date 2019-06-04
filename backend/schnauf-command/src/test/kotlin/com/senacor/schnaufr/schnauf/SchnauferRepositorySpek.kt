@@ -13,11 +13,11 @@ class SchnauferRepositorySpek : Spek({
         val client by mongoDB(port = 27017)
         val sut by memoized { SchnaufRepository(client) }
 
-        it("can create and read schnaufs") {
+        it("can create and readById schnaufs") {
             val schnauf = Schnauf(id = UUID(), title = "integration-tests-sind-kacke-schnauf")
             sut.create(schnauf).blockingGet()
 
-            val result = sut.read(schnauf.id).blockingGet()
+            val result = sut.readById(schnauf.id).blockingGet()
             expectThat(result.title).isEqualTo("integration-tests-sind-kacke-schnauf")
         }
     }

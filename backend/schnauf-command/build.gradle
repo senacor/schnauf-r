@@ -83,6 +83,7 @@ dependencies {
 
     testImplementation group: "de.flapdoodle.embed", name: "de.flapdoodle.embed.mongo", version: "2.2.0"
 
+    testImplementation group: "org.awaitility", name: "awaitility", version: "3.0.0"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
