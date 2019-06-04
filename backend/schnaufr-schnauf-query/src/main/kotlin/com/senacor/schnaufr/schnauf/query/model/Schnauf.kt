@@ -1,4 +1,4 @@
-package com.senacor.schnaufr.schnauf.query
+package com.senacor.schnaufr.schnauf.query.model
 
 import com.squareup.moshi.JsonClass
 import java.util.*

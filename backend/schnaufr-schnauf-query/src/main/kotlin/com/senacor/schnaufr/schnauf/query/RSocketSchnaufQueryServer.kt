@@ -1,7 +1,5 @@
 package com.senacor.schnaufr.schnauf.query
 
-import com.mongodb.reactivestreams.client.MongoClient
-import com.mongodb.reactivestreams.client.MongoClients
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.rsocket.kotlin.RSocket
@@ -14,16 +12,17 @@ class RSocketSchnaufQueryServer() {
 
     private lateinit var disposable: Disposable;
 
-    private fun createMongoClient(): MongoClient {
-        return MongoClients.create("");
+
+    private fun createSchnaufClient(): SchnaufClient {
+        return SchnaufClient();
     }
 
-    private fun createSchnaufRepository(): SchnaufRepository {
-        return SchnaufRepository(createMongoClient());
+    private fun createSchnaufrClient(): SchnaufrClient {
+        return SchnaufrClient();
     }
 
     private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
-        return Single.just(SchnaufMessageHandler(createSchnaufRepository()))
+        return Single.just(SchnaufMessageHandler(createSchnaufClient(), createSchnaufrClient()))
     }
 
     fun start() {
