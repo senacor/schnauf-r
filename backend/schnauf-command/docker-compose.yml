@@ -39,4 +39,4 @@ services:
     ports:
       - 8080:8080
     environment:
-      - MONGO_HOST: mongo0
+      - MONGO_HOST=mongo0
