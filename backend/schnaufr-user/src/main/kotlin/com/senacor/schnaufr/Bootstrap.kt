@@ -20,9 +20,8 @@ object Bootstrap {
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 disposable?.dispose()
-                logger.info("Starting stopped")
                 executor.shutdownNow()
-                logger.info("Starting stopped")
+                logger.info("Application stopped")
             }
         })
 
