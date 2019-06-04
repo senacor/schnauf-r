@@ -15,6 +15,7 @@ class SchnaufRepository(private val client: MongoClient) {
     private val collection = database.getCollection<Schnauf>()
 
     fun read(): Publisher<Schnauf> {
+        
         logger.info("Getting all schnaufs from Mongo");
         return collection.find();
     }

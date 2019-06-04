@@ -1,22 +1,29 @@
 package com.senacor.schnaufr.schnauf.query
 
-import com.senacor.schnaufr.UUID
-import com.senacor.schnaufr.UUIDAdapter
-import com.squareup.moshi.Moshi
-import io.reactivex.Flowable
+import com.mongodb.reactivestreams.client.MongoClient
+import com.mongodb.reactivestreams.client.MongoClients
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import io.rsocket.kotlin.*
+import io.rsocket.kotlin.RSocket
+import io.rsocket.kotlin.RSocketFactory
+import io.rsocket.kotlin.Setup
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
-import io.rsocket.kotlin.util.AbstractRSocket
 
 
 class RSocketSchnaufQueryServer() {
 
     private lateinit var disposable: Disposable;
 
+    private fun createMongoClient(): MongoClient {
+        return MongoClients.create("");
+    }
+
+    private fun createSchnaufRepository(): SchnaufRepository {
+        return SchnaufRepository(createMongoClient());
+    }
+
     private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
-        return Single.just(MessageHandler())
+        return Single.just(SchnaufMessageHandler(createSchnaufRepository()))
     }
 
     fun start() {
@@ -32,18 +39,6 @@ class RSocketSchnaufQueryServer() {
         disposable.dispose()
     }
 
-    private class MessageHandler : AbstractRSocket() {
 
-
-        override fun requestStream(payload: Payload): Flowable<Payload> {
-            val moshi = Moshi.Builder().add(UUIDAdapter).build();
-            val jsonAdapter = SchnaufJsonAdapter(moshi);
-
-            return Flowable.fromIterable(listOf(Schnauf(UUID(), "christoph", "schnauf"), Schnauf(UUID(), "michael", "schnauf2")))
-                    .map(jsonAdapter::toJson).map { DefaultPayload.text(it) };
-
-
-        }
-    }
 }
 
