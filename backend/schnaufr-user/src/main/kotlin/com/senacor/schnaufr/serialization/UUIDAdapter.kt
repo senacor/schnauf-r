@@ -1,7 +1,6 @@
 package com.senacor.schnaufr.serialization
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.ToJson
+import com.squareup.moshi.*
 import java.util.UUID
 
 object UUIDAdapter {

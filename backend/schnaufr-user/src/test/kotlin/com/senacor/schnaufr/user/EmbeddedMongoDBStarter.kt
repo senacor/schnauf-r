@@ -22,7 +22,10 @@ fun Suite.mongoDB(port: Int = 27017): MemoizedValue<MongoClient> {
             mongoDBStarter.start(port)
             KMongo.createClient(ConnectionString("mongodb://localhost:$port"))
         },
-        destructor = { mongoDBStarter.stop() }
+        destructor = {
+            it.close()
+            mongoDBStarter.stop()
+        }
     )
 }
 

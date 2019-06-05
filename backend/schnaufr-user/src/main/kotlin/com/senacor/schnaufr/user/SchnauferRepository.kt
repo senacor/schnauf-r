@@ -5,15 +5,13 @@ import com.mongodb.client.gridfs.model.*
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
-import io.reactivex.*
 import org.bson.Document
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
-import org.litote.kmongo.rxjava2.*
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.*
 import java.io.InputStream
 import java.util.UUID
-import javax.print.attribute.standard.JobOriginatingUserName
 
 class SchnauferRepository(private val client: MongoClient) {
 
@@ -25,43 +23,40 @@ class SchnauferRepository(private val client: MongoClient) {
     private val collection = database.getCollection<Schnaufer>()
     private val bucket = GridFSBuckets.create(database, "avatar")
 
-    fun create(schnaufer: Schnaufer): Single<Schnaufer> {
-        return collection.insertOne(schnaufer).single()
-            .flatMapMaybe { read(schnaufer.id) }
-            .toSingle()
+    fun create(schnaufer: Schnaufer): Mono<Schnaufer> {
+        return collection.insertOne(schnaufer).toMono()
+            .flatMap { read(schnaufer.id) }
     }
 
-    fun read(id: UUID): Maybe<Schnaufer> {
-
-        collection.watchIndefinitely {  }
-        return collection.findOne(Schnaufer::id eq id)
+    fun read(id: UUID): Mono<Schnaufer> {
+        return collection.findOne(Schnaufer::id eq id).toMono()
             .doOnSubscribe { logger.info("Looking up user id '$id' in MongoDB") }
     }
 
-    fun readByUsername(userName: String): Maybe<Schnaufer> {
-        return collection.findOne(Schnaufer::username eq userName)
+    fun readByUsername(userName: String): Mono<Schnaufer> {
+        return collection.findOne(Schnaufer::username eq userName).toMono()
             .doOnSubscribe { logger.info("Looking up user with name '$userName' in MongoDB") }
     }
 
-    fun saveAvatar(schnauferId: UUID, data: InputStream): Completable {
+    fun saveAvatar(schnauferId: UUID, data: InputStream): Mono<UUID> {
 
         val options = GridFSUploadOptions()
             .chunkSizeBytes(1024 * 1024)
             .metadata(Document("schnauferId", schnauferId))
 
         val streamToUpload = toAsyncInputStream(data)
-        return bucket.uploadFromStream("avatar", streamToUpload, options).single()
+        return bucket.uploadFromStream("avatar", streamToUpload, options).toMono()
             .doOnSuccess { logger.info("successfully uploaded avatar with id {}", schnauferId) }
             .doOnError { logger.error("failed to upload avatar with id {}", schnauferId, it) }
-            .doOnDispose { streamToUpload.close() }
-            .ignoreElement()
+            .doFinally { streamToUpload.close() }
+            .map { UUID.fromString(it.toString()) }
     }
 
-    fun readAvatar(schnauferId: UUID): Maybe<GridFSFile> {
+    fun readAvatar(schnauferId: UUID): Mono<GridFSFile> {
 
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
-        return bucket.find(whereQuery).maybe()
+        return bucket.find(whereQuery).toMono()
     }
 }

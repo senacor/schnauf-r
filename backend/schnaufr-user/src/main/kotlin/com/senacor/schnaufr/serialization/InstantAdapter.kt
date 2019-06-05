@@ -1,9 +1,7 @@
 package com.senacor.schnaufr.serialization
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.ToJson
+import com.squareup.moshi.*
 import java.time.Instant
-import java.time.LocalDate
 
 internal object InstantAdapter {
     @ToJson
