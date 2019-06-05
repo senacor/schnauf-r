@@ -3,6 +3,7 @@ package com.senacor.schnaufr.user
 import com.mongodb.BasicDBObject
 import com.mongodb.client.gridfs.model.*
 import com.mongodb.reactivestreams.client.MongoClient
+import com.mongodb.reactivestreams.client.gridfs.AsyncOutputStream
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
 import io.reactivex.*
@@ -10,6 +11,7 @@ import org.bson.Document
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.litote.kmongo.rxjava2.*
+import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.util.UUID
@@ -33,7 +35,7 @@ class SchnauferRepository(private val client: MongoClient) {
 
     fun read(id: UUID): Maybe<Schnaufer> {
 
-        collection.watchIndefinitely {  }
+        collection.watchIndefinitely { }
         return collection.findOne(Schnaufer::id eq id)
             .doOnSubscribe { logger.info("Looking up user id '$id' in MongoDB") }
     }
@@ -57,11 +59,13 @@ class SchnauferRepository(private val client: MongoClient) {
             .ignoreElement()
     }
 
-    fun readAvatar(schnauferId: UUID): Maybe<GridFSFile> {
+    fun readAvatar(schnauferId: UUID, downloadStream: AsyncOutputStream): Maybe<Publisher<Long>> {
 
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
-        return bucket.find(whereQuery).maybe()
+        return bucket.find(whereQuery).maybe().map {
+            bucket.downloadToStream(it.objectId, downloadStream)
+        }
     }
 }
