@@ -6,6 +6,7 @@ import io.rsocket.kotlin.exceptions.ApplicationException
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
 import org.litote.kmongo.rxjava2.blockingAwait
 import org.spekframework.spek2.Spek
+import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.*
 import strikt.assertions.*
@@ -24,23 +25,25 @@ class SchnauferSpek : Spek({
 
         val server = SchnauferServer(MessageHandler(schnauferRepository))
 
-        lateinit var closeable: Closeable
-
         before {
-            closeable = server.setup().blockingGet()
+            server.start()
         }
 
         after {
-            closeable.close()
+            server.stop()
         }
 
-        val rSocket: RSocket by lazy {
-            RSocketFactory
-                .connect()
-                .transport(TcpClientTransport.create(9090))
-                .start()
-                .blockingGet()
-        }
+        val rSocket: RSocket by memoized(
+            mode = CachingMode.SCOPE,
+            factory = {
+                RSocketFactory
+                    .connect()
+                    .transport(TcpClientTransport.create(9090))
+                    .start()
+                    .blockingGet()
+            },
+            destructor = { it.close().blockingAwait() }
+        )
 
         context("when a user is requested by id") {
 

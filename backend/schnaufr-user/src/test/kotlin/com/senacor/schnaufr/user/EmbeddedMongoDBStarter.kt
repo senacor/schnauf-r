@@ -10,7 +10,8 @@ import de.flapdoodle.embed.process.runtime.Network
 import org.litote.kmongo.reactivestreams.KMongo
 import org.spekframework.spek2.lifecycle.*
 import org.spekframework.spek2.style.specification.Suite
-
+import java.io.File
+import java.nio.file.Files.deleteIfExists
 
 fun Suite.mongoDB(port: Int = 27017): MemoizedValue<MongoClient> {
 
@@ -31,6 +32,7 @@ class EmbeddedMongoDBStarter {
     private lateinit var mongod: MongodProcess
 
     fun start(port: Int = 27017) {
+        removeEmbeddedMongoFile()
         val command = Command.MongoD
 
         val runtimeConfig = RuntimeConfigBuilder()
@@ -57,5 +59,17 @@ class EmbeddedMongoDBStarter {
     fun stop() {
         mongodExecutable.stop()
         mongod.stop()
+        removeEmbeddedMongoFile()
+    }
+
+    private fun removeEmbeddedMongoFile() {
+        val tempFile = System.getenv("temp") + File.separator + "extract-" + System.getenv("USERNAME") + "-extractmongod"
+        val executable = if (System.getenv("OS") != null && System.getenv("OS").contains("Windows")) {
+            "$tempFile.exe"
+        } else {
+            "$tempFile.sh"
+        }
+        deleteIfExists(File(executable).toPath())
+        deleteIfExists(File("$tempFile.pid").toPath())
     }
 }
