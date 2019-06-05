@@ -44,14 +44,6 @@ class SchnauferSpek : Spek({
 
         context("when a user is requested by id") {
 
-            it("it return 'userNotFound' for unknown user") {
-                val findUserPayload = DefaultPayload.text(UUID().toString(), """{"operation": "findUserById"}""")
-
-                expectThrows<ApplicationException> {
-                    rSocket.requestResponse(findUserPayload).blockingGet()
-                }.message.isEqualTo("userNotFound")
-            }
-
             it("returns a schnaufer") {
                 val schnaufer = Schnaufer(
                     id = UUID(),
@@ -67,9 +59,33 @@ class SchnauferSpek : Spek({
                 val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
                 expectThat(foundSchnaufer).isEqualTo(schnaufer)
             }
+
+            it("it return 'userNotFound' for unknown user") {
+                val findUserPayload = DefaultPayload.text(UUID().toString(), """{"operation": "findUserById"}""")
+
+                expectThrows<ApplicationException> {
+                    rSocket.requestResponse(findUserPayload).blockingGet()
+                }.message.isEqualTo("userNotFound")
+            }
         }
 
         context("when a user is requested by username") {
+
+            it("returns a schnaufer") {
+                val schnaufer = Schnaufer(
+                    id = UUID(),
+                    avatarId = UUID(),
+                    username = "heinz",
+                    displayName = "Heinzi"
+                )
+
+                schnauferRepository.create(schnaufer).blockingGet()
+
+                val requestPayload = DefaultPayload.text(schnaufer.username, """{"operation": "findUserByUsername"}""")
+                val response = rSocket.requestResponse(requestPayload).blockingGet()
+                val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
+                expectThat(foundSchnaufer).isEqualTo(schnaufer)
+            }
 
             it("should return empty for unknown user") {
                 val findUserPayload = DefaultPayload.text("Hermann", """{"operation": "findUserByUsername"}""")
