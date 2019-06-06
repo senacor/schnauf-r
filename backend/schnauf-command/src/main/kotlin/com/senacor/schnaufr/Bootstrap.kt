@@ -2,8 +2,8 @@ package com.senacor.schnaufr
 
 import com.mongodb.ConnectionString
 import com.senacor.schnaufr.schnauf.MessageHandler
-import com.senacor.schnaufr.schnauf.SchnaufServer
 import com.senacor.schnaufr.schnauf.SchnaufRepository
+import com.senacor.schnaufr.schnauf.SchnaufServer
 import org.litote.kmongo.reactivestreams.KMongo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +15,6 @@ object Bootstrap {
     @JvmStatic
     fun main(args: Array<String>) {
         val executor = Executors.newSingleThreadExecutor()
-
 
         val mongoHost = System.getenv("MONGO_HOST") ?: "mongo"
         val mongoPort = System.getenv("MONGO_PORT")?.toInt() ?: 27017
@@ -39,8 +38,6 @@ object Bootstrap {
 
         executor.execute {
             logger.info("Starting application, connecting to MongoDB at $mongoConnectionString")
-
-            logger.info("Starting application")
             server.start()
             logger.info("Application started")
             Thread.currentThread().join()
