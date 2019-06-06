@@ -3,15 +3,14 @@ const createSubscription = (flowable, {onNext, onError, onLimitReached}, request
   let subscriptionCounter = 0;
 
   flowable.subscribe({
-    onNext: (data) => {
+    onNext: (response) => {
       subscriptionCounter++;
       if (subscriptionCounter >= requestSize) {
         subscriptionCounter = 0;
         onLimitReached(() => subscription.request(requestSize));
       }
-      onNext(data);
+      onNext(response.data);
     },
-    // TODO: Error Handling
     onError: onError,
     onSubscribe: (sub) => {
       subscription = sub;
@@ -22,7 +21,7 @@ const createSubscription = (flowable, {onNext, onError, onLimitReached}, request
   return  subscription.cancel;
 };
 
-const createSchnaufClient = (requestSize) => (socket) => {
+const createRequestStreamClient = (requestSize) => (socket) => {
 
   const subscribe = (callbacks) => {
     const flowable = socket.requestStream({ data: {}});
@@ -32,4 +31,4 @@ const createSchnaufClient = (requestSize) => (socket) => {
   return subscribe
 }
 
-export default createSchnaufClient
+export default createRequestStreamClient
