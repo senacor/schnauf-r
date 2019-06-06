@@ -1,0 +1,10 @@
+#jinja2: variable_start_string:'${', variable_end_string:'}', trim_blocks: True
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schnauf-user-config
+data:
+  APPLICATION_PORT: "8080"
+  MONGO_HOST: "localhost"
+  MONGO_PORT: "27017"
+
