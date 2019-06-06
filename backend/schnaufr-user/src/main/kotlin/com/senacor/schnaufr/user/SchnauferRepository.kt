@@ -6,12 +6,14 @@ import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.gridfs.AsyncOutputStream
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
+import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncOutputStream
 import org.bson.Document
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.*
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.util.UUID
 
@@ -54,13 +56,15 @@ class SchnauferRepository(private val client: MongoClient) {
             .map { it.toString() }
     }
 
-    fun readAvatar(schnauferId: UUID, downloadStream: AsyncOutputStream): Mono<Publisher<Long>> {
+    fun readAvatar(schnauferId: UUID, asyncOutputStream: AsyncOutputStream): Flux<Long> {
 
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
-        return bucket.find(whereQuery).toMono().map {
-            bucket.downloadToStream(it.objectId, downloadStream)
+        return bucket.find(whereQuery).toMono().flatMapMany {
+            bucket.downloadToStream(it.objectId, asyncOutputStream)
+        }.flatMap {
+
         }
     }
 }

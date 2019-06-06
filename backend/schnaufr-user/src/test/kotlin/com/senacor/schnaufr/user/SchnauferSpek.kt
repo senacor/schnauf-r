@@ -11,6 +11,11 @@ import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.toMono
 import strikt.api.*
 import strikt.assertions.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.nio.channels.FileChannel
+import java.nio.file.Path
 
 class SchnauferSpek : Spek({
 
@@ -86,7 +91,8 @@ class SchnauferSpek : Spek({
 
                 schnauferRepository.create(schnaufer).block()
 
-                val requestPayload = DefaultPayload.create(schnaufer.username, """{"operation": "findUserByUsername"}""")
+                val requestPayload =
+                    DefaultPayload.create(schnaufer.username, """{"operation": "findUserByUsername"}""")
                 val response = rSocket.requestResponse(requestPayload).block()
                 val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
                 expectThat(foundSchnaufer).isEqualTo(schnaufer)
@@ -98,6 +104,27 @@ class SchnauferSpek : Spek({
                 expectThrows<ApplicationErrorException> {
                     rSocket.requestResponse(findUserPayload).block()
                 }.message.isEqualTo("userNotFound")
+            }
+        }
+
+        context("when an avatar requested by id") {
+
+            it("returns a schnaufer avatar") {
+                // Given
+                val file = File("/home/mpeters/Downloads/VID_20190603_073254.mp4")
+                val inputStream = FileInputStream(file)
+                val schnauferId = UUID()
+                schnauferRepository.saveAvatar(schnauferId, inputStream)
+
+
+                val requestPayload =
+                    DefaultPayload.create(schnauferId.toString(), """{"operation": "readAvatar"}""")
+                val response = rSocket.requestResponse(requestPayload).block()
+                val byteBuffer = response.data
+                val fileOutputStream = FileOutputStream("./test.mp4")
+                val channel = fileOutputStream.channel
+                channel.write(byteBuffer, 0)
+                channel.close()
             }
         }
 

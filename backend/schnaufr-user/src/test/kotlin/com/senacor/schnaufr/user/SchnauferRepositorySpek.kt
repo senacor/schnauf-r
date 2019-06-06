@@ -7,6 +7,9 @@ import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.toMono
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
+import strikt.assertions.isGreaterThan
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -38,12 +41,14 @@ class SchnauferRepositorySpek : Spek({
             val schnauferId = UUID()
             sut.saveAvatar(schnauferId = schnauferId, data = inputStream).block()
 
-            val outputStream = AsyncStreamHelper.toAsyncOutputStream(FileOutputStream(File("./test.mp4")))
-            sut.readAvatar(schnauferId, outputStream).map {
-                it.toMono().block()
+            val bos = ByteArrayOutputStream()
+            sut.readAvatar(schnauferId, AsyncStreamHelper.toAsyncOutputStream(bos)).map {
+                val fos = FileOutputStream("test.mp4")
+                fos.write((it as ByteArrayOutputStream).toByteArray())
+                fos.close()
             }.block()
 
-            outputStream.close()
+            expectThat(bos.size()).isGreaterThan(0)
         }
 
     }
