@@ -6,6 +6,7 @@ import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.Setup
 import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
+import io.rsocket.kotlin.transport.netty.server.WebsocketRouteTransport
 import io.rsocket.kotlin.transport.netty.server.WebsocketServerTransport
 import org.slf4j.LoggerFactory
 
@@ -28,7 +29,7 @@ class RSocketSchnaufQueryServer() {
         return RSocketFactory
                 .receive()
                 .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
-                .transport(WebsocketServerTransport.create(8080))  // Netty websocket transport
+                .transport(WebsocketServerTransport.create("localhost", 8080))  // Netty websocket transport
                 .start()
                 .doOnSuccess { logger.info("Server started") }
     }
