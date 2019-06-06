@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles';
+import './index.scss'
 import Schnaufs from './SchnaufList';
 import createRSocket from './schnaufSocket'
 
@@ -15,7 +15,7 @@ createRSocket({url: 'ws://127.0.0.1:8080'}).then((socket) => {
   flowable.subscribe({
     onNext: (data) => {
       subscriptionCounter++;
-      if(subscriptionCounter >=requestSize ){
+      if (subscriptionCounter >=requestSize ) {
         subscriptionCounter = 0;
         subscription.request(requestSize);
       }
