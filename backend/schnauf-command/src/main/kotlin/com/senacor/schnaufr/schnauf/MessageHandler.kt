@@ -1,28 +1,24 @@
 package com.senacor.schnaufr.schnauf
 
+import com.senacor.schnaufr.*
 import com.senacor.schnaufr.model.CreateSchnaufRequest
-import com.senacor.schnaufr.model.operation
-import com.senacor.schnaufr.model.principal
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.rsocket.kotlin.Payload
-import io.rsocket.kotlin.util.AbstractRSocket
+import io.rsocket.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-const val CREATE_SCHNAUF = "createSchnauf"
-const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
-const val WATCH_SCHNAUFS = "watchSchnaufs"
-const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
+import reactor.core.publisher.*
 
 class MessageHandler(private val schnaufRepository: SchnaufRepository) : AbstractRSocket() {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
+        const val CREATE_SCHNAUF = "createSchnauf"
+        const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
+        const val WATCH_SCHNAUFS = "watchSchnaufs"
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
     }
 
-    override fun requestResponse(payload: Payload): Single<Payload> {
+    override fun requestResponse(payload: Payload): Mono<Payload> {
         return when (payload.operation) {
             CREATE_SCHNAUF -> {
                 val schnaufRequest = CreateSchnaufRequest.fromJson(payload.dataUtf8)
@@ -32,11 +28,11 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
                         .map { it.asPayload() }
             }
 
-            else -> return Single.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
+            else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
     }
 
-    override fun requestStream(payload: Payload): Flowable<Payload> {
+    override fun requestStream(payload: Payload): Flux<Payload> {
         val principal = payload.principal
 
         return when (payload.operation) {
@@ -49,7 +45,6 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
             WATCH_SCHNAUFS ->
                 schnaufRepository
                         .watch(principal)
-                        .toFlowable(BackpressureStrategy.BUFFER)
                         .map { it.asPayload() }
 
 
@@ -59,11 +54,10 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
                         .concatWith(
                                 schnaufRepository
                                         .watch(principal)
-                                        .toFlowable(BackpressureStrategy.BUFFER)
                         )
                         .map { it.asPayload() }
 
-            else -> return Flowable.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
+            else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
     }
 }

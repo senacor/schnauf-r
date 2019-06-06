@@ -1,5 +1,8 @@
 package com.senacor.schnaufr.schnauf.query
 
+import io.mockk.every
+import io.mockk.mockk
+import io.reactivex.Flowable
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
@@ -9,16 +12,12 @@ import strikt.api.expectThat
 import strikt.assertions.isFalse
 
 class RSocketSchnaufQueryServerSpek : Spek({
-
     describe("schnauf query server") {
-        val sut = RSocketSchnaufQueryServer()
-
+        val schnaufMessageHandler = mockk<SchnaufMessageHandler>()
+        every { schnaufMessageHandler.requestStream(any()) } returns Flowable.fromArray()
 
         before {
-            sut.start()
-        }
-        after {
-            sut.stop()
+            val sut = RSocketSchnaufQueryServer(schnaufMessageHandler).setup().blockingGet()
         }
 
         it("can respond") {

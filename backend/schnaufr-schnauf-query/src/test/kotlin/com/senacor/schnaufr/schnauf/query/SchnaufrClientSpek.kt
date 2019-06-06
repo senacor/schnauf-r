@@ -13,15 +13,11 @@ import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-
-val USERID = UUID();
-const val USERNAME = "foo"
-const val DISPLAYNAME = "bar"
-const val FINDUSER_OPERATION = "findUser"
-
 class SchnaufrClientSpek : Spek({
-
-
+    val USERID = UUID();
+    val USERNAME = "foo"
+    val DISPLAYNAME = "bar"
+    val FINDUSER_OPERATION = "findUser"
     class SchnaufrTestService() {
         private lateinit var disposable: Disposable;
 

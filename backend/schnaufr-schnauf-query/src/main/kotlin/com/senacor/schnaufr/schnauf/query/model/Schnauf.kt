@@ -8,6 +8,10 @@ import java.util.*
 
 // author: User / ID and probably geoloaction or something like that
 data class Schnauf(val id: UUID, val submitter: UUID, val title: String) {
+    companion object {
+        fun fromJson(value: String): Schnauf = JsonSerializer.fromJson(value)
+    }
+
     fun toJson(): String = JsonSerializer.toJsonString(this)
 
     fun asPayload(): Payload {
