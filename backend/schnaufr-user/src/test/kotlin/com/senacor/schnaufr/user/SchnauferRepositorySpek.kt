@@ -1,6 +1,6 @@
 package com.senacor.schnaufr.user
 
-import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.toMono
@@ -25,7 +25,7 @@ class SchnauferRepositorySpek : Spek({
             sut.create(schaufer).block()
 
             val result = sut.read(schaufer.id).block()
-            expectThat(result.displayName).isEqualTo("Moni")
+            expectThat(result?.displayName).isEqualTo("Moni")
         }
 
         it("can read avatars") {
@@ -36,8 +36,8 @@ class SchnauferRepositorySpek : Spek({
 
             val gridFSFile = sut.readAvatar(schnauferId).block()
 
-            expectThat(gridFSFile.filename).isEqualTo("avatar")
-            expectThat(gridFSFile.metadata).hasEntry("schnauferId", schnauferId)
+            expectThat(gridFSFile?.filename).isEqualTo("avatar")
+            expectThat(gridFSFile?.metadata).isNotNull().hasEntry("schnauferId", schnauferId)
         }
 
     }
