@@ -34,11 +34,11 @@ class SchnaufRepository(client: MongoClient) {
     private val database = client.getDatabase("schnauf")
     private val collection = database.getCollection<Schnauf>()
 
-    private fun recipientFilter(principal: String?, recipients: List<String>): Boolean = principal?.let {
+    private fun recipientFilter(principal: UUID?, recipients: List<UUID>): Boolean = principal?.let {
         return recipients.contains(principal) || recipients.isEmpty()
     } ?: true
 
-    private fun recipientFilterBson(principal: String?, recipients: KProperty1<Schnauf, List<String>>): Bson = principal?.let {
+    private fun recipientFilterBson(principal: UUID?, recipients: KProperty1<Schnauf, List<UUID>>): Bson = principal?.let {
         Filters.or(
                 recipients contains principal,
                 recipients size 0
@@ -55,11 +55,11 @@ class SchnaufRepository(client: MongoClient) {
         return collection.findOne(Schnauf::id eq id)
     }
 
-    fun readLatest(limit: Int = 10, principal: String? = null): Flowable<Schnauf> {
+    fun readLatest(limit: Int = 10, principal: UUID? = null): Flowable<Schnauf> {
         return Flowable.fromPublisher(collection.find(recipientFilterBson(principal, Schnauf::recipients)).limit(limit))
     }
 
-    fun watch(principal: String? = null): Observable<Schnauf> {
+    fun watch(principal: UUID? = null): Observable<Schnauf> {
         val publisher = PublishSubject.create<Schnauf>()
 
         collection.withKMongo().watchIndefinitely(

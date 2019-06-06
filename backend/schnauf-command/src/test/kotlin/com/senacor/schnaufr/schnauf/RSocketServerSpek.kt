@@ -1,5 +1,6 @@
 package com.senacor.schnaufr.schnauf
 
+import com.senacor.schnaufr.aUUID
 import com.senacor.schnaufr.model.CreateSchnaufRequest
 import io.rsocket.kotlin.Closeable
 import io.rsocket.kotlin.DefaultPayload
@@ -15,6 +16,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 const val PORT: Int = 8090
@@ -29,7 +31,7 @@ class RSocketServerSpek : Spek({
         lateinit var rSocket: RSocket
         lateinit var closeable: Closeable
 
-        fun createSchnauf(title: String, submitter: String, recipients: List<String> = listOf()): Schnauf {
+        fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf()): Schnauf {
             val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients)
             val createPayload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
             val addResponse = rSocket.requestResponse(createPayload).blockingGet()
@@ -59,7 +61,8 @@ class RSocketServerSpek : Spek({
 
         describe("creating a new schnauf with request/response") {
             it("it should throw if the operation name is wrong") {
-                val schnaufRequest = CreateSchnaufRequest("first-schnauf", "darth vader")
+                val submitter = aUUID()
+                val schnaufRequest = CreateSchnaufRequest("first-schnauf", submitter)
                 val payload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "someWrongOperationName"}""")
 
                 expectThrows<ApplicationException> {
@@ -69,7 +72,7 @@ class RSocketServerSpek : Spek({
 
             it("should create a new schnauf") {
                 val title = "first-schnauf"
-                val submitter = "darth vader"
+                val submitter = aUUID()
                 val createdSchnauf = createSchnauf(title, submitter)
 
                 // assert creation
@@ -94,7 +97,7 @@ class RSocketServerSpek : Spek({
             it("should retrieve all former schnaufs once") {
                 // create a schnauf
                 val title = "first-schnauf"
-                val submitter = "darth vader"
+                val submitter = aUUID()
                 createSchnauf(title, submitter)
 
                 // get all schnaufs
@@ -115,24 +118,25 @@ class RSocketServerSpek : Spek({
             // This is only headache so we'll skip that for now
 
             it("should retrieve all former schnaufs that are either without recipients or directed at me") {
+                val myPrincipal = aUUID()
                 // create a few schnaufs
                 val title1 = "first-schnauf"
-                val submitter1 = "darth vader"
+                val submitter1 = aUUID()
                 createSchnauf(title1, submitter1) // broadcast
 
                 val title2 = "second-schnauf"
-                val submitter2 = "darth vader"
-                createSchnauf(title2, submitter2, listOf("obi-wan")) // to me
+                val submitter2 = aUUID()
+                createSchnauf(title2, submitter2, listOf(myPrincipal)) //me
 
                 val title3 = "first-schnauf"
-                val submitter3 = "darth vader"
-                createSchnauf(title3, submitter3, listOf("obi-wan")) // to me
+                val submitter3 = aUUID()
+                createSchnauf(title3, submitter3, listOf(myPrincipal)) //me
 
                 val title4 = "first-schnauf"
-                val submitter4 = "darth vader"
-                createSchnauf(title4, submitter4, listOf("leia")) // to someone different
+                val submitter4 = aUUID()
+                createSchnauf(title4, submitter4, listOf(aUUID())) // to someone different
 
-                val getAllPayload = DefaultPayload.text("", """{"operation": "getAllSchnaufs","principal":"obi-wan"}""")
+                val getAllPayload = DefaultPayload.text("", """{"operation": "getAllSchnaufs","principal":"$myPrincipal"}""")
                 rSocket.requestStream(getAllPayload)
                         .take(5)
                         .test()
