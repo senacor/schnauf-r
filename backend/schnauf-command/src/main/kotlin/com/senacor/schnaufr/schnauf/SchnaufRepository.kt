@@ -34,9 +34,10 @@ class SchnaufRepository(client: MongoClient) {
     private val database = client.getDatabase("schnauf")
     private val collection = database.getCollection<Schnauf>()
 
-    private fun recipientFilter(principal: UUID?, recipients: List<UUID>): Boolean = principal?.let {
-        return recipients.contains(principal) || recipients.isEmpty()
-    } ?: true
+    private fun recipientFilter(principal: UUID?): (List<UUID>) -> Boolean =
+            fun(recipients: List<UUID>): Boolean = principal?.let {
+                return recipients.contains(principal) || recipients.isEmpty()
+            } ?: true
 
     private fun recipientFilterBson(principal: UUID?, recipients: KProperty1<Schnauf, List<UUID>>): Bson = principal?.let {
         Filters.or(
@@ -60,6 +61,8 @@ class SchnaufRepository(client: MongoClient) {
     }
 
     fun watch(principal: UUID? = null): Observable<Schnauf> {
+        val recipientFilter = recipientFilter(principal)
+
         val publisher = PublishSubject.create<Schnauf>()
 
         collection.withKMongo().watchIndefinitely(
@@ -69,7 +72,7 @@ class SchnaufRepository(client: MongoClient) {
                     document.fullDocument?.let {
                         logger.info("Found new document on watch: $it")
 
-                        if (recipientFilter(principal, it.recipients)) { // TODO
+                        if (recipientFilter(it.recipients)) {
                             publisher.onNext(it)
                         }
                     }

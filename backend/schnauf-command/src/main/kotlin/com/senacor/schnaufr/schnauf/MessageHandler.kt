@@ -11,15 +11,15 @@ import io.rsocket.kotlin.util.AbstractRSocket
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-const val CREATE_SCHNAUF = "createSchnauf"
-const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
-const val WATCH_SCHNAUFS = "watchSchnaufs"
-const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
-
 class MessageHandler(private val schnaufRepository: SchnaufRepository) : AbstractRSocket() {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
+        const val CREATE_SCHNAUF = "createSchnauf"
+        const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
+        const val WATCH_SCHNAUFS = "watchSchnaufs"
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
     }
 
     override fun requestResponse(payload: Payload): Single<Payload> {
