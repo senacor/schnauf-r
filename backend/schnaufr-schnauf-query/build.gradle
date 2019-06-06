@@ -131,6 +131,11 @@ shadowJar {
 }
 
 jib {
+    container {
+        environment = [
+                SCHNAUF_COMMAND_HOST: 'localhost'
+        ]
+    }
     to {
         image = "gcr.io/main-stack-241307/query-schnauf:latest"
     }

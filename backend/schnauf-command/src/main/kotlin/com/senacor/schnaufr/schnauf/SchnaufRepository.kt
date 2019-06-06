@@ -26,11 +26,12 @@ class SchnaufRepository(client: MongoClient) {
     private val database = client.getDatabase("schnauf")
     private val collection = database.getCollection<Schnauf>()
 
-    private fun recipientFilter(principal: String?, recipients: List<String>): Boolean = principal?.let {
-        return recipients.contains(principal) || recipients.isEmpty()
-    } ?: true
+    private fun recipientFilter(principal: UUID): (List<UUID>) -> Boolean =
+            fun(recipients: List<UUID>): Boolean = principal?.let {
+                return recipients.contains(principal) || recipients.isEmpty()
+            }
 
-    private fun recipientFilterBson(principal: String?, recipients: KProperty1<Schnauf, List<String>>): Bson = principal?.let {
+    private fun recipientFilterBson(principal: UUID?, recipients: KProperty1<Schnauf, List<UUID>>): Bson = principal?.let {
         Filters.or(
                 recipients contains principal,
                 recipients size 0
@@ -46,13 +47,12 @@ class SchnaufRepository(client: MongoClient) {
         return collection.findOne(Schnauf::id eq id).toMono()
     }
 
-    fun readLatest(limit: Int = 10, principal: String? = null): Flux<Schnauf> {
-        return Flux.defer {
-            collection.find(recipientFilterBson(principal, Schnauf::recipients)).limit(limit)
-        }
+    fun readLatest(limit: Int = 10, principal: UUID? = null): Flux<Schnauf> {
+        return Flux.defer { (collection.find(recipientFilterBson(principal, Schnauf::recipients)).limit(limit)) }
     }
 
-    fun watch(principal: String? = null): Flux<Schnauf> {
+    fun watch(principal: UUID? = null): Flux<Schnauf> {
+        val recipientFilter = principal?.let { recipientFilter(it) } ?: { true }
 
         val emitter = EmitterProcessor.create<Schnauf>()
 
@@ -63,7 +63,7 @@ class SchnaufRepository(client: MongoClient) {
                     document.fullDocument?.let {
                         logger.info("Found new document on watch: $it")
 
-                        if (recipientFilter(principal, it.recipients)) { // TODO
+                        if (recipientFilter(it.recipients)) {
                             emitter.onNext(it)
                         }
                     }

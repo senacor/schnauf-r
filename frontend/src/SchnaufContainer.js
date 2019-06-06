@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
-import SchnaufList from "./SchnaufList";
+import SchnaufList from './SchnaufList';
 
 export default class SchnaufContainer extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       schnaufs :[],
@@ -14,9 +14,9 @@ export default class SchnaufContainer extends Component {
 
   onNext = (schnauf) => {
     this.setState((prevState) => ({
-        ...prevState,
-        isLoading: false,
-        schnaufs: [schnauf.data, ...prevState.schnaufs ]
+      ...prevState,
+      isLoading: false,
+      schnaufs: [schnauf.data, ...prevState.schnaufs ]
     }));
   }
 
@@ -40,7 +40,7 @@ export default class SchnaufContainer extends Component {
     this.unsubscribe()
   }
 
-  render(){
+  render() {
     return (
       <SchnaufList schnaufs={this.state.schnaufs}/>
     )

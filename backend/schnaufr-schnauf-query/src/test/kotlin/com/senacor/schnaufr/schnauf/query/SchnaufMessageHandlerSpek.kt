@@ -8,9 +8,6 @@ import io.mockk.mockk
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.rsocket.kotlin.DefaultPayload
-import io.rsocket.kotlin.Payload
-import io.rsocket.kotlin.RSocketFactory
-import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
