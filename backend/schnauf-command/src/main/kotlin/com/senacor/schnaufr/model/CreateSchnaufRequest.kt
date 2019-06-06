@@ -4,7 +4,7 @@ import com.senacor.schnaufr.serialization.JsonSerializer
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class CreateSchnaufRequest(val title: String, val submitter: String) {
+data class CreateSchnaufRequest(val title: String, val submitter: String, val recipients: List<String> = listOf()) {
 
     companion object {
         fun fromJson(value: String): CreateSchnaufRequest = JsonSerializer.fromJson(value)
