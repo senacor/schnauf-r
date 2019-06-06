@@ -8,7 +8,7 @@ import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class RSocketServer(private val messageHandler: MessageHandler) {
+class RSocketServer(private val messageHandler: MessageHandler, private val port: Int = 8080) {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(RSocketServer::class.java)
@@ -18,7 +18,7 @@ class RSocketServer(private val messageHandler: MessageHandler) {
             RSocketFactory
                     .receive()
                     .acceptor { { setup, rSocket -> handler(setup, rSocket) } }
-                    .transport(TcpServerTransport.create(8080))
+                    .transport(TcpServerTransport.create(port))
                     .start()
                     .doOnSuccess { logger.info("Server started") }
 

@@ -1,5 +1,6 @@
 package com.senacor.schnaufr.schnauf
 
+import com.senacor.schnaufr.aUUID
 import com.senacor.schnaufr.model.CreateSchnaufRequest
 import io.rsocket.kotlin.Closeable
 import io.rsocket.kotlin.DefaultPayload
@@ -8,13 +9,17 @@ import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.exceptions.ApplicationException
 import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
 import org.awaitility.Awaitility.await
+import org.litote.kmongo.rxjava2.blockingGet
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
+import java.util.*
 import java.util.concurrent.TimeUnit
+
+const val PORT: Int = 8090
 
 class RSocketServerSpek : Spek({
 
@@ -22,17 +27,28 @@ class RSocketServerSpek : Spek({
         val client by mongoDB(port = 27067)
         val schnaufRepository by memoized { SchnaufRepository(client) }
         val messageHandler by memoized { MessageHandler(schnaufRepository) }
-        val rSocketServer by memoized { RSocketServer(messageHandler) }
+        val rSocketServer by memoized { RSocketServer(messageHandler, PORT) }
         lateinit var rSocket: RSocket
         lateinit var closeable: Closeable
+
+        fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf()): Schnauf {
+            val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients)
+            val createPayload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
+            val addResponse = rSocket.requestResponse(createPayload).blockingGet()
+            return Schnauf.fromPayload(addResponse)
+        }
 
         before {
             closeable = rSocketServer.start().blockingGet()
             rSocket = RSocketFactory
                     .connect()
-                    .transport(TcpClientTransport.create(8080))
+                    .transport(TcpClientTransport.create(PORT))
                     .start()
                     .blockingGet()
+        }
+
+        beforeEach {
+            schnaufRepository.deleteAll().blockingGet()
         }
 
         after {
@@ -45,7 +61,8 @@ class RSocketServerSpek : Spek({
 
         describe("creating a new schnauf with request/response") {
             it("it should throw if the operation name is wrong") {
-                val schnaufRequest = CreateSchnaufRequest("first-schnauf", "darth vader")
+                val submitter = aUUID()
+                val schnaufRequest = CreateSchnaufRequest("first-schnauf", submitter)
                 val payload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "someWrongOperationName"}""")
 
                 expectThrows<ApplicationException> {
@@ -54,15 +71,13 @@ class RSocketServerSpek : Spek({
             }
 
             it("should create a new schnauf") {
-                val schnaufRequest = CreateSchnaufRequest("first-schnauf", "darth vader")
-                val payload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
+                val title = "first-schnauf"
+                val submitter = aUUID()
+                val createdSchnauf = createSchnauf(title, submitter)
 
-                val response = rSocket.requestResponse(payload).blockingGet()
-
-                val createdSchnauf = Schnauf.fromPayload(response)
-
-                expectThat(createdSchnauf.title).isEqualTo(schnaufRequest.title)
-                expectThat(createdSchnauf.submitter).isEqualTo(schnaufRequest.submitter)
+                // assert creation
+                expectThat(createdSchnauf.title).isEqualTo(title)
+                expectThat(createdSchnauf.submitter).isEqualTo(submitter)
 
                 await().atMost(5, TimeUnit.SECONDS).until {
                     schnaufRepository.readLatest().toList().blockingGet().isNotEmpty()
@@ -81,28 +96,54 @@ class RSocketServerSpek : Spek({
 
             it("should retrieve all former schnaufs once") {
                 // create a schnauf
-                val schnaufRequest = CreateSchnaufRequest("first-schnauf", "darth vader")
-                val createPayload = DefaultPayload.text(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
-                val addResponse = rSocket.requestResponse(createPayload).blockingGet()
-                val createdSchnauf = Schnauf.fromPayload(addResponse)
+                val title = "first-schnauf"
+                val submitter = aUUID()
+                createSchnauf(title, submitter)
 
                 // get all schnaufs
                 val getAllPayload = DefaultPayload.text("", """{"operation": "getAllSchnaufs"}""")
-                val getAllResponse = rSocket.requestStream(getAllPayload).blockingFirst()
-                val requestedSchnauf = Schnauf.fromPayload(getAllResponse)
-
-                // assert creation
-                expectThat(createdSchnauf.title).isEqualTo(schnaufRequest.title)
-                expectThat(createdSchnauf.submitter).isEqualTo(schnaufRequest.submitter)
-
-                // assert getting all schnaufs
-                expectThat(requestedSchnauf.title).isEqualTo(schnaufRequest.title)
-                expectThat(requestedSchnauf.submitter).isEqualTo(schnaufRequest.submitter)
+                rSocket.requestStream(getAllPayload)
+                        .take(5)
+                        .test()
+                        .awaitCount(1)
+                        .assertValueCount(1)
+                        .assertComplete()
+                        .assertValue {
+                            val schnauf = Schnauf.fromPayload(it)
+                            schnauf.submitter == submitter && schnauf.title == title
+                        }
             }
 
-            // we can't test watching new schnaufs b/c this would require
-            // to spin up a Mongo replica set locally. This is only headache
-            // so we'll skip that for now
+            // we can't test watching new schnaufs b/c this would require to spin up a Mongo replica set locally.
+            // This is only headache so we'll skip that for now
+
+            it("should retrieve all former schnaufs that are either without recipients or directed at me") {
+                val myPrincipal = aUUID()
+                // create a few schnaufs
+                val title1 = "first-schnauf"
+                val submitter1 = aUUID()
+                createSchnauf(title1, submitter1) // broadcast
+
+                val title2 = "second-schnauf"
+                val submitter2 = aUUID()
+                createSchnauf(title2, submitter2, listOf(myPrincipal)) //me
+
+                val title3 = "first-schnauf"
+                val submitter3 = aUUID()
+                createSchnauf(title3, submitter3, listOf(myPrincipal)) //me
+
+                val title4 = "first-schnauf"
+                val submitter4 = aUUID()
+                createSchnauf(title4, submitter4, listOf(aUUID())) // to someone different
+
+                val getAllPayload = DefaultPayload.text("", """{"operation": "getAllSchnaufs","principal":"$myPrincipal"}""")
+                rSocket.requestStream(getAllPayload)
+                        .take(5)
+                        .test()
+                        .awaitCount(3)
+                        .assertValueCount(3)
+                        .assertComplete()
+            }
         }
     }
 })

@@ -6,6 +6,8 @@ import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.Setup
 import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
 import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
+import io.rsocket.kotlin.transport.netty.server.WebsocketRouteTransport
+import io.rsocket.kotlin.transport.netty.server.WebsocketServerTransport
 import org.slf4j.LoggerFactory
 
 class RSocketSchnaufQueryServer(private val schnaufMessageHandler: SchnaufMessageHandler) {
@@ -17,7 +19,7 @@ class RSocketSchnaufQueryServer(private val schnaufMessageHandler: SchnaufMessag
     private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
         return Single.just(schnaufMessageHandler)
     }
-
+    
     fun setup(): Single<NettyContextCloseable> {
         return RSocketFactory
                 .receive()
