@@ -19,8 +19,7 @@ const createRSocket = ({url}) => {
     rSocketClient.connect().subscribe({
       onComplete: resolve,
       onError: reject,
-      onSubscribe: () => console.log('HUHU'),
-      onNext: () => console.log
+      onSubscribe: () => console.log(`subscribed to ${url}`),
     });
   })
 }

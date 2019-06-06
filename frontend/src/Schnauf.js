@@ -1,14 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Card} from 'react-bootstrap'
 
-const Schnauf = ({schnauf}) => <div>
-  <span>
-    <span>{schnauf.title}</span>
-  </span>
-  <span>
-    <span>{schnauf.author.displayName}</span>
-  </span>
-</div>;
+const Schnauf = ({schnauf}) =>
+<Card>
+  <Card.Body>
+    <Card.Title>{schnauf.title}</Card.Title>
+    <Card.Text>
+      {schnauf.author.displayName}
+    </Card.Text>
+  </Card.Body>
+</Card>
 
 Schnauf.propTypes = {
   schnauf: PropTypes.object.isRequired
