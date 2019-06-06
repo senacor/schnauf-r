@@ -15,9 +15,9 @@ class SchnauferRepositorySpek : Spek({
 
         it("can create and read schnaufs") {
             val schnauf = Schnauf(id = UUID(), title = "integration-tests-sind-kacke-schnauf", submitter = "darth vader")
-            sut.create(schnauf).blockingGet()
+            sut.create(schnauf).block()
 
-            val result = sut.readById(schnauf.id).blockingGet()
+            val result = sut.readById(schnauf.id).block()!!
             expectThat(result.title).isEqualTo("integration-tests-sind-kacke-schnauf")
             expectThat(result.submitter).isEqualTo("darth vader")
         }

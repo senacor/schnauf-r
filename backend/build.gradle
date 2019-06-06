@@ -52,7 +52,6 @@ subprojects {
         implementation group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlin_version
 
         implementation group: 'io.reactivex.rxjava2', name: 'rxkotlin', version: rxkotlin_version
-        implementation group: 'io.reactivex.rxjava2', name: 'rxjava', version: rxjava_version
 
         implementation group: 'com.squareup.moshi', name: 'moshi-kotlin', version: moshi_version
         kapt group: 'com.squareup.moshi', name: 'moshi-kotlin-codegen', version: moshi_version
@@ -83,8 +82,7 @@ subprojects {
         testImplementation group: 'io.mockk', name: 'mockk', version: mockk_version
         testImplementation group: 'io.strikt', name: 'strikt-core', version: strikt_version
 
-        testImplementation group: "de.flapdoodle.embed", name: "de.flapdoodle.embed.mongo", version: "2.2.0"
-
+        testImplementation 'io.projectreactor:reactor-test:3.2.3.RELEASE'
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

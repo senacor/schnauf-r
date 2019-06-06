@@ -1,0 +1,6 @@
+dependencies {
+    implementation project(':schnaufr-commons')
+
+
+    testImplementation project(':schnaufr-commons-test')
+}
