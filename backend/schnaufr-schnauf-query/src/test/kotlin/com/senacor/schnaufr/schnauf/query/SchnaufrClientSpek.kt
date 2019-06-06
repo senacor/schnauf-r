@@ -3,13 +3,12 @@ package com.senacor.schnaufr.schnauf.query
 import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.schnauf.query.model.MetaData
 import com.senacor.schnaufr.schnauf.query.model.Schnaufr
-import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.rsocket.kotlin.*
-import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
-import io.rsocket.kotlin.util.AbstractRSocket
+import io.rsocket.*
+import io.rsocket.transport.netty.server.TcpServerTransport
+import io.rsocket.util.DefaultPayload
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import reactor.core.publisher.Mono
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
@@ -18,38 +17,40 @@ class SchnaufrClientSpek : Spek({
     val USERNAME = "foo"
     val DISPLAYNAME = "bar"
     val FINDUSER_OPERATION = "findUser"
-    class SchnaufrTestService() {
-        private lateinit var disposable: Disposable;
+
+    class SchnaufrTestService {
+        private lateinit var disposable: Closeable
 
         fun start() {
             disposable = RSocketFactory
                     .receive()
-                    .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
+                    .acceptor(this::handler)
                     .transport(TcpServerTransport.create(8082))  // Netty websocket transport
-                    .start().subscribe();
+                    .start()
+                    .block()!!
         }
 
         fun stop() {
             disposable.dispose()
         }
 
-        private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
+        fun handler(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
             val testSchnauf = Schnaufr(USERID, UUID(), USERNAME, DISPLAYNAME)
-            return Single.just(object : AbstractRSocket() {
-                override fun requestResponse(payload: Payload): Single<Payload> {
+            return Mono.just(object : AbstractRSocket() {
+                override fun requestResponse(payload: Payload): Mono<Payload> {
                     val operation = MetaData.fromJson(payload.metadataUtf8)?.operation;
 
                     if (FINDUSER_OPERATION.equals(operation) && payload.dataUtf8.equals(USERID.toString())) {
-                        return return Single.just(DefaultPayload.text(testSchnauf.toJson()))
+                        return return Mono.just(DefaultPayload.create(testSchnauf.toJson()))
                     }
-                    return Single.never()
+                    return Mono.never()
                 }
             });
         }
     }
 
     describe("schnaufr client") {
-        val sut = SchnaufrClient()
+        val sut = SchnauferClient()
         val testService = SchnaufrTestService()
 
         before {
@@ -63,11 +64,11 @@ class SchnaufrClientSpek : Spek({
 
         it("can find schnaufr by id") {
 
-            val schnaufr = sut.getSchnaufrById(USERID).blockingGet();
+            val schnaufr = sut.getSchnaufrById(USERID).block()!!
 
-            expectThat(schnaufr.displayName).isEqualTo(DISPLAYNAME);
-            expectThat(schnaufr.username).isEqualTo(USERNAME);
-            expectThat(schnaufr.id).isEqualTo(USERID);
+            expectThat(schnaufr.displayName).isEqualTo(DISPLAYNAME)
+            expectThat(schnaufr.username).isEqualTo(USERNAME)
+            expectThat(schnaufr.id).isEqualTo(USERID)
         }
 
 

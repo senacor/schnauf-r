@@ -2,22 +2,27 @@ package com.senacor.schnaufr.schnauf.query
 
 import io.mockk.every
 import io.mockk.mockk
-import io.reactivex.Flowable
-import io.rsocket.kotlin.DefaultPayload
-import io.rsocket.kotlin.RSocketFactory
-import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
+import io.rsocket.RSocketFactory
+import io.rsocket.transport.netty.client.TcpClientTransport
+import io.rsocket.util.DefaultPayload
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import reactor.core.publisher.Flux
 import strikt.api.expectThat
 import strikt.assertions.isFalse
 
 class RSocketSchnaufQueryServerSpek : Spek({
     describe("schnauf query server") {
         val schnaufMessageHandler = mockk<SchnaufMessageHandler>()
-        every { schnaufMessageHandler.requestStream(any()) } returns Flowable.fromArray()
+        every { schnaufMessageHandler.requestStream(any()) } returns Flux.empty()
+
+        val server = SchnaufQueryServer(schnaufMessageHandler, 8080)
 
         before {
-            val sut = RSocketSchnaufQueryServer(schnaufMessageHandler).setup().blockingGet()
+            server.start()
+        }
+        after {
+            server.stop()
         }
 
         it("can respond") {
@@ -25,9 +30,11 @@ class RSocketSchnaufQueryServerSpek : Spek({
                     .connect()
                     .transport(TcpClientTransport.create(8080))
                     .start()
-                    .blockingGet()
+                    .block()!!
 
-            val iterator = rsSocket.requestStream(DefaultPayload.EMPTY).blockingIterable().iterator()
+            val iterator = rsSocket
+                .requestStream(DefaultPayload.create(DefaultPayload.EMPTY_BUFFER))
+                .toIterable().iterator()
 
             expectThat(iterator.hasNext()).isFalse()
         }

@@ -17,7 +17,7 @@ import reactor.core.publisher.*
 import java.util.*
 import kotlin.reflect.KProperty1
 
-class SchnaufRepository(client: MongoClient) {
+class SchnaufRepository(private val client: MongoClient) {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger("JsonSerializer")
