@@ -17,7 +17,7 @@ jib {
         ]
     }
     to {
-        image = "gcr.io/main-stack-241307/query-schnauf:latest"
+        image = "gcr.io/main-stack-241307/schnauf-query:latest"
     }
 }
 

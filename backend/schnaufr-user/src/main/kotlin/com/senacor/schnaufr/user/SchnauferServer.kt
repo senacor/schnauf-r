@@ -11,6 +11,7 @@ class SchnauferServer(
 
     companion object {
         val logger = LoggerFactory.getLogger(SchnauferServer::class.java)
+        val APPLICATION_PORT = System.getenv("APPLICATION_PORT")?.toInt() ?: 8080
     }
 
     private var closeable: CloseableChannel? = null
@@ -19,7 +20,7 @@ class SchnauferServer(
         closeable = RSocketFactory
             .receive()
             .acceptor(this::handler)
-            .transport(TcpServerTransport.create(9090))
+            .transport(TcpServerTransport.create(APPLICATION_PORT))
             .start()
             .doOnSuccess { logger.info("Server started") }
             .block()

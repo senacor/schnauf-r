@@ -18,7 +18,8 @@ object Bootstrap {
 
 
         val mongoHost = System.getenv("MONGO_HOST") ?: "mongo"
-        val mongoConnectionString = "mongodb://$mongoHost:27017"
+        val mongoPort = System.getenv("MONGO_PORT")?.toInt() ?: 27017
+        val mongoConnectionString = "mongodb://$mongoHost:$mongoPort"
 
         val server = SchnaufServer(
             MessageHandler(

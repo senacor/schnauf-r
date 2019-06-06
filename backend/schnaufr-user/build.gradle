@@ -4,3 +4,16 @@ dependencies {
 
     testImplementation project(':schnaufr-commons-test')
 }
+
+jib {
+    container {
+        environment = [
+                APPLICATION_PORT: '9090',
+                MONGO_HOST: 'mongoUser',
+                MONGO_PORT: '27017'
+        ]
+    }
+    to {
+        image = "gcr.io/main-stack-241307/schnauf-user:latest"
+    }
+}
