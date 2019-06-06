@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: schnaufr-schnauf
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mongo

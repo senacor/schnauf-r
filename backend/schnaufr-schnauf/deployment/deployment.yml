@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: schnaufr-schnauf
+  namespace: schnaufr-schnauf
   labels:
     app: schnaufr-schnauf
 spec:
@@ -34,5 +35,5 @@ spec:
               containerPort: 8080
           env:
             - name: MONGO_HOST
-              value: mongo-0.mongo,mongo-1.mongo,mongo-2.mongo
+              value: mongo-0.mongo.mongo,mongo-1.mongo.mongo,mongo-2.mongo.mongo
           terminationMessagePath: /dev/stdout

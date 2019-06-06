@@ -15,7 +15,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: default
+    namespace: mongo
 roleRef:
   kind: ClusterRole
   name: get-pods-for-mongo-sidecar
