@@ -1,6 +1,6 @@
 package com.senacor.schnaufr.user
 
-import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.toMono

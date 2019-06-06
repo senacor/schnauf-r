@@ -1,6 +1,6 @@
 package com.senacor.schnaufr.user
 
-import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.*
 import io.rsocket.*
 import io.rsocket.exceptions.ApplicationErrorException
 import io.rsocket.transport.netty.client.TcpClientTransport
