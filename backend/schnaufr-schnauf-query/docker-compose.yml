@@ -40,3 +40,14 @@ services:
       - 8080:8080
     environment:
       - MONGO_HOST=mongo0
+
+  schnauf-query:
+    image: gcr.io/main-stack-241307/query-schnauf:latest
+    depends_on:
+      - schnauf-command
+    ports:
+      - 8090:8090
+    environment:
+      - APPLICATION_PORT=8090
+      - SCHNAUF_COMMAND_HOST=schnauf-command
+      - SCHNAUF_COMMAND_PORT=8080

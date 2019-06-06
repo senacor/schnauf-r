@@ -10,6 +10,10 @@ object Bootstrap {
 
     val logger = LoggerFactory.getLogger(Bootstrap::class.java)
 
+    val mongoHost = System.getenv("MONGO_HOST") ?: "localhost"
+    val mongoPort = System.getenv("MONGO_PORT")?.toInt() ?: "27017"
+    val mongoConnectionString = "mongodb://$mongoHost:$mongoPort"
+
     @JvmStatic
     fun main(args: Array<String>) {
         val executor = Executors.newSingleThreadExecutor()
@@ -17,7 +21,7 @@ object Bootstrap {
         val server = SchnauferServer(
             MessageHandler(
                 SchnauferRepository(
-                    KMongo.createClient(ConnectionString("mongodb://localhost:27017"))
+                    KMongo.createClient(ConnectionString(mongoConnectionString))
                 )
             )
         )
