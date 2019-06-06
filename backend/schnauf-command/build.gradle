@@ -14,4 +14,7 @@ jib {
     container {
         environment = [ MONGO_HOST: 'mongo0' ]
     }
+    to {
+        image = "gcr.io/main-stack-241307/schnauf-command:latest"
+    }
 }
