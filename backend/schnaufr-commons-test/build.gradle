@@ -1,0 +1,18 @@
+dependencies {
+    implementation group: "de.flapdoodle.embed", name: "de.flapdoodle.embed.mongo", version: "2.2.0"
+
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junit_version
+    runtimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junit_version
+
+    implementation("org.spekframework.spek2:spek-dsl-jvm:$spek_version") {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+    runtimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek_version") {
+        exclude group: 'org.junit.platform'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+    implementation group: 'io.mockk', name: 'mockk', version: mockk_version
+    implementation group: 'io.strikt', name: 'strikt-core', version: strikt_version
+}

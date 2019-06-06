@@ -1,6 +1,6 @@
 package com.senacor.schnaufr.schnauf
 
-import com.senacor.schnaufr.aUUID
+import com.senacor.schnaufr.*
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
@@ -14,11 +14,13 @@ class SchnauferRepositorySpek : Spek({
         val sut by memoized { SchnaufRepository(client) }
 
         it("can create and read schnaufs") {
-            val submitter = aUUID()
-            val schnauf = Schnauf(id = aUUID(), title = "integration-tests-sind-kacke-schnauf", submitter = submitter)
-            sut.create(schnauf).blockingGet()
 
-            val result = sut.readById(schnauf.id).blockingGet()
+            val submitter = UUID()
+            val schnauf = Schnauf(id = UUID(), title = "integration-tests-sind-kacke-schnauf", submitter = submitter)
+            sut.create(schnauf).block()!!
+
+
+            val result = sut.readById(schnauf.id).block()!!
             expectThat(result.title).isEqualTo("integration-tests-sind-kacke-schnauf")
             expectThat(result.submitter).isEqualTo(submitter)
         }
