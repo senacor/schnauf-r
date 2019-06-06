@@ -24,8 +24,11 @@ class SchnauferRepository(private val client: MongoClient) {
     private val bucket = GridFSBuckets.create(database, "avatar")
 
     fun create(schnaufer: Schnaufer): Mono<Schnaufer> {
+        logger.info("Try to create user $schnaufer")
         return collection.insertOne(schnaufer).toMono()
             .flatMap { read(schnaufer.id) }
+                .doOnError { logger.error(it.message) }
+                .doOnSuccess{ logger.info("Successfully created $schnaufer") }
     }
 
     fun read(id: UUID): Mono<Schnaufer> {

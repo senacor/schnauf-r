@@ -26,7 +26,7 @@ object Bootstrap {
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 schnaufClient.stop()
-                // schnauferClient.stop()
+                schnauferClient.stop()
                 executor.shutdownNow()
                 logger.info("Application stopped")
             }
@@ -37,7 +37,7 @@ object Bootstrap {
 
             logger.info("Connecting to Clients")
             schnaufClient.start()
-            // schnauferClient.start()
+            schnauferClient.start()
 
             server.start()
             logger.info("Application started")

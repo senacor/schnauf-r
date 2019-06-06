@@ -8,7 +8,7 @@ import reactor.core.publisher.*
 class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnauferClient: SchnauferClient) : AbstractRSocket() {
     override fun requestStream(payload: Payload): Flux<Payload> {
         return schnaufClient.getAllSchnaufs()
-                // .flatMapSingle { enrichWithSchnaufrInformation(it) }
+                .flatMap { enrichWithSchnaufrInformation(it) }
                 .map { it.asPayload() }
     }
 

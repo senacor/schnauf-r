@@ -20,7 +20,7 @@ class SchnauferClient {
     private val connectionString = "$schnaufrClientHost:$schnaufrClientPort"
 
     companion object {
-        const val FIND_USER_COMMAND = "findUser"
+        const val FIND_USER_COMMAND = "findUserById"
         val logger: Logger = LoggerFactory.getLogger(SchnaufQueryServer::class.java)
     }
 

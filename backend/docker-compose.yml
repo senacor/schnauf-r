@@ -42,22 +42,23 @@ services:
       - MONGO_HOST=mongo0
       - MONGO_PORT=27017
 
-  mongoUser:
+  mongo-user:
     image: mongo:3.6-xenial
     restart: always
     ports:
-      - 27020:27017
-    command: mongod --bind_ip_all
+      - "27020:27020"
+    command: mongod --bind_ip_all --port 27020
+
 
   schnauf-user:
     image: gcr.io/main-stack-241307/schnauf-user:latest
     depends_on:
-      - mongoUser
+      - mongo-user
     ports:
       - 9090:9090
     environment:
       - APPLICATION_PORT=9090
-      - MONGO_HOST=mongoUser
+      - MONGO_HOST=mongo-user
       - MONGO_PORT=27020
 
   schnauf-query:
