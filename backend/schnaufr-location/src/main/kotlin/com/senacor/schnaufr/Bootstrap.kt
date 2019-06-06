@@ -4,8 +4,6 @@ import com.mongodb.ConnectionString
 import com.mongodb.reactivestreams.client.MongoClient
 import com.senacor.schnaufr.location.GeolocationRepository
 import com.senacor.schnaufr.location.GeolocationServer
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
 import org.litote.kmongo.reactivestreams.KMongo
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ExecutorService
@@ -15,7 +13,6 @@ object Bootstrap {
 
     private val logger = LoggerFactory.getLogger(Bootstrap::class.java)
 
-    private var disposable: Disposable? = null
     private lateinit var geolocationServer: GeolocationServer
 
     @JvmStatic
@@ -31,9 +28,7 @@ object Bootstrap {
             val databaseConnection = createDatabaseConnection()
             val geolocationRepository = GeolocationRepository(databaseConnection)
             geolocationServer = GeolocationServer(geolocationRepository)
-            disposable = geolocationServer
-                    .start()
-                    .subscribeBy { logger.info("Application started") }
+            geolocationServer.start()
 
             Thread.currentThread().join()
         }
@@ -42,7 +37,7 @@ object Bootstrap {
     private fun setupApplicationShutdown(executor: ExecutorService) {
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
-                disposable?.dispose()
+                geolocationServer.stop()
                 executor.shutdownNow()
                 logger.info("Application stopped")
             }

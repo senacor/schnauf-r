@@ -1,7 +1,8 @@
 package com.senacor.schnaufr.location
 
-import io.rsocket.kotlin.RSocketFactory
-import io.rsocket.kotlin.transport.netty.client.TcpClientTransport
+import com.senacor.schnaufr.mongoDB
+import io.rsocket.RSocketFactory
+import io.rsocket.transport.netty.client.TcpClientTransport
 import org.reactivestreams.Publisher
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -17,7 +18,7 @@ class GeolocationServerSpek : Spek({
 
 
         before {
-            sut.start().blockingGet()
+            sut.start()
         }
         after {
             sut.stop()
@@ -32,10 +33,11 @@ class GeolocationServerSpek : Spek({
                     .connect()
                     .transport(TcpClientTransport.create(8080))
                     .start()
-                    .blockingGet()
+                    .block()!!
 
-            val channel = rSocket
-                    .requestChannel(Publisher {  })
+            val channel = rSocket.requestChannel(Publisher {  })
+
+
         }
     }
 })

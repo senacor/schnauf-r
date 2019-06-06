@@ -1,32 +1,39 @@
 package com.senacor.schnaufr.location
 
-import io.reactivex.Single
-import io.rsocket.kotlin.RSocket
-import io.rsocket.kotlin.RSocketFactory
-import io.rsocket.kotlin.Setup
-import io.rsocket.kotlin.transport.netty.server.NettyContextCloseable
-import io.rsocket.kotlin.transport.netty.server.TcpServerTransport
+
+import io.rsocket.ConnectionSetupPayload
+import io.rsocket.RSocket
+import io.rsocket.RSocketFactory
+import io.rsocket.transport.netty.server.CloseableChannel
+import io.rsocket.transport.netty.server.TcpServerTransport
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
 
 class GeolocationServer(val repository: GeolocationRepository) {
 
     private val logger = LoggerFactory.getLogger(GeolocationServer::class.java)
+    private val messageHandler = GeolocationMessageHandler(repository)
 
-    private fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
-        return Single.just(GeolocationMessageHandler(repository))
-    }
+    private var closeable: CloseableChannel? = null
 
-    fun start(): Single<NettyContextCloseable> {
-        return RSocketFactory
+    fun start() {
+        closeable = RSocketFactory
                 .receive()
-                .acceptor { { setup, rSocket -> handler(setup, rSocket) } }
+                .acceptor(this::handler)
                 .transport(TcpServerTransport.create(8080))
                 .start()
                 .doOnSuccess { logger.info("Server started") }
+                .block()
     }
 
     fun stop() {
-        // Nothing to do
+        closeable?.dispose()
+        logger.info("Server stopped")
+    }
+
+    private fun handler(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
+        logger.info("Received setup {}", setup)
+        return Mono.just(messageHandler)
     }
 
 }

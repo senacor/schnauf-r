@@ -1,8 +1,8 @@
 package com.senacor.schnaufr.location
 
 import com.senacor.schnaufr.serialization.JsonSerializer
-import io.rsocket.kotlin.DefaultPayload
-import io.rsocket.kotlin.Payload
+import io.rsocket.Payload
+import io.rsocket.util.DefaultPayload
 import java.time.Instant
 
 data class Geolocation(val latitude: Double,
@@ -11,6 +11,6 @@ data class Geolocation(val latitude: Double,
     fun toJson(): String = JsonSerializer.toJsonString(this)
 
     fun asPayload(): Payload {
-        return DefaultPayload.text(toJson())
+        return DefaultPayload.create(toJson())
     }
 }
