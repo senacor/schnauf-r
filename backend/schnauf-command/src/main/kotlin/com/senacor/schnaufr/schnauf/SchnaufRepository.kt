@@ -27,7 +27,7 @@ class SchnaufRepository(client: MongoClient) {
     private val collection = database.getCollection<Schnauf>()
 
     private fun recipientFilter(principal: UUID): (List<UUID>) -> Boolean =
-            fun(recipients: List<UUID>): Boolean = principal?.let {
+            fun(recipients: List<UUID>): Boolean = principal.let {
                 return recipients.contains(principal) || recipients.isEmpty()
             }
 
