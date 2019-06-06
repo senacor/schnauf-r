@@ -2,4 +2,4 @@ package com.senacor.schnaufr
 
 import java.util.UUID
 
-fun aUUID(): UUID = UUID.randomUUID()
+fun UUID(): UUID = UUID.randomUUID()
