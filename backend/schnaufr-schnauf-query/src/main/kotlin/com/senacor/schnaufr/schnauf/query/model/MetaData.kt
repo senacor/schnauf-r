@@ -1,8 +1,8 @@
 package com.senacor.schnaufr.schnauf.query.model
 
 import com.senacor.schnaufr.serialization.JsonSerializer
-import io.rsocket.kotlin.DefaultPayload
-import io.rsocket.kotlin.Payload
+import io.rsocket.Payload
+import io.rsocket.util.DefaultPayload
 
 data class MetaData(val operation: String) {
     companion object {
@@ -12,6 +12,6 @@ data class MetaData(val operation: String) {
     fun toJson(): String = JsonSerializer.toJsonString(this)
 
     fun asPayload(): Payload {
-        return DefaultPayload.text(toJson())
+        return DefaultPayload.create(toJson())
     }
 }
