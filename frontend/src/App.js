@@ -30,11 +30,12 @@ class App extends Component {
   }
 
   addNotification = (notifiactionMessage) => {
-    console.log(notifiactionMessage);
     this.setState((prevState) => ({
       ... prevState,
       notification: notifiactionMessage,
     }));
+
+    setTimeout(this.removeNotification, 5000);
   }
 
   render() {
