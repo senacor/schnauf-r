@@ -1,15 +1,19 @@
 import React, {Component} from 'react';
+import {Spinner, Row, Alert} from 'react-bootstrap';
 import SchnaufFeed from './SchnaufFeed';
 import createRequestStreamClient from '../requestStreamClient'
 import createRSocket from '../rSocketClient'
+import {withNotification} from '../NotificationContext';
 
-export default class SchnaufFeedContainer extends Component {
+class SchnaufFeedContainer extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       schnaufs :[],
-      isLoading: true
+      loading: true,
+      error: false,
+
     }
     this.unsubscribe = () => {};
   }
@@ -17,13 +21,18 @@ export default class SchnaufFeedContainer extends Component {
   onNext = (schnauf) => {
     this.setState((prevState) => ({
       ...prevState,
-      isLoading: false,
+      loading: false,
+      error: false,
       schnaufs: [schnauf, ...prevState.schnaufs ]
     }));
   }
 
   onError = (error) => {
-    console.error(error);
+    this.setState((prevState) => ({
+      error: true,
+      loading: false
+    }));
+    this.props.addNotification('Fehler beim Laden');
   }
 
   onLimitReached = (requestNext) => {
@@ -31,13 +40,17 @@ export default class SchnaufFeedContainer extends Component {
   }
 
   componentDidMount = async () => {
-    const socket = await createRSocket({url: 'ws://127.0.0.1:8080'})
-    const subscribe = await createRequestStreamClient(1)(socket)
-    this.unsubscribe = subscribe({
-      onNext: this.onNext,
-      onError: this.onError,
-      onLimitReached: this.onLimitReached,
-    });
+    try {
+      const socket = await createRSocket({url: 'ws://127.0.0.1:8080'})
+      const subscribe = await createRequestStreamClient(1)(socket)
+      this.unsubscribe = subscribe({
+        onNext: this.onNext,
+        onError: this.onError,
+        onLimitReached: this.onLimitReached,
+      });
+    } catch (error) {
+      this.onError();
+    }
   }
 
   componentWillUnmount = () => {
@@ -45,9 +58,18 @@ export default class SchnaufFeedContainer extends Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <Row className="justify-content-md-center">
+          <Spinner animation="border" />
+        </Row>
+      );
+    }
     return (
       <SchnaufFeed schnaufs={this.state.schnaufs}/>
     )
   }
 
 }
+
+export default withNotification(SchnaufFeedContainer);
