@@ -13,6 +13,7 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnaufrClient
     override fun requestStream(payload: Payload): Flowable<Payload> {
         return Flowable.fromArray(
                 SchnaufFeedEntry(UUID.randomUUID(), "I want to do Frontend stuff", Author(UUID.randomUUID(), "blumenmartin", "Martin Blume")),
+                SchnaufFeedEntry(UUID.randomUUID(), "Wellen sind zu groß", Author(UUID.randomUUID(), "matzepewters", "Mathias Peters")),
                 SchnaufFeedEntry(UUID.randomUUID(), "I want backend stuff to work", Author(UUID.randomUUID(), "cersfeld", "Christoph Ersfeld"))).map { it.asPayload() }
     }
 
