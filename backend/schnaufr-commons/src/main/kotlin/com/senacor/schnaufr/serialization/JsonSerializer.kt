@@ -3,7 +3,7 @@ package com.senacor.schnaufr.serialization
 import com.squareup.moshi.*
 import org.slf4j.LoggerFactory
 
-object JsonSerializer {
+public object JsonSerializer {
 
     val logger = LoggerFactory.getLogger("JsonSerializer")
     val moshi: Moshi

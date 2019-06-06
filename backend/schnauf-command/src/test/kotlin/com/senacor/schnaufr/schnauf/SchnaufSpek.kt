@@ -28,7 +28,7 @@ class SchnaufSpek : Spek({
         val messageHandler by memoized { MessageHandler(schnaufRepository) }
         val server by memoized { SchnaufServer(messageHandler, PORT) }
         lateinit var rSocket: RSocket
-        lateinit var closeable: Closeable
+
 
         fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf()): Schnauf {
             val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients)
