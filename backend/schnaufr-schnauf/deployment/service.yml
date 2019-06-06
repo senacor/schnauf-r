@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: schnauf-command
+  name: schnaufr-schnauf
 spec:
   selector:
-    app: schnauf-command
+    app: schnaufr-schnauf
   type: LoadBalancer
   ports:
     - name: tcp-app

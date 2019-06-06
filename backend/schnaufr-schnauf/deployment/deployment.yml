@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: schnauf-command
+  name: schnaufr-schnauf
   labels:
-    app: schnauf-command
+    app: schnaufr-schnauf
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -13,15 +13,15 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: schnauf-command
+      app: schnaufr-schnauf
   template:
     metadata:
       labels:
-        app: schnauf-command
+        app: schnaufr-schnauf
     spec:
       containers:
-        - name: schnauf-command
-          image: gcr.io/main-stack-241307/schnauf-command
+        - name: schnaufr-schnauf
+          image: gcr.io/main-stack-241307/schnaufr-schnauf
           resources:
             limits:
               cpu: 500m

@@ -32,8 +32,8 @@ services:
       - ./scripts:/scripts
     entrypoint: [ "/scripts/mongo_setup.sh" ]
 
-  schnauf-command:
-    image: gcr.io/main-stack-241307/schnauf-command:latest
+  schnaufr-schnauf:
+    image: gcr.io/main-stack-241307/schnaufr-schnauf:latest
     depends_on:
       - mongosetup
     ports:
@@ -64,13 +64,13 @@ services:
   schnauf-query:
     image: gcr.io/main-stack-241307/schnauf-query:latest
     depends_on:
-      - schnauf-command
+      - schnaufr-schnauf
       - schnauf-user
     ports:
       - 8090:8090
     environment:
       - APPLICATION_PORT=8090
-      - SCHNAUF_COMMAND_HOST=schnauf-command
+      - SCHNAUF_COMMAND_HOST=schnaufr-schnauf
       - SCHNAUF_COMMAND_PORT=8080
       - SCHNAUFR_HOST=schnauf-user
       - SCHNAUFR_PORT=9090
