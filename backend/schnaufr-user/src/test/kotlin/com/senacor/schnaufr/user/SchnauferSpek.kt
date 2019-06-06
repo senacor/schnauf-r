@@ -1,5 +1,6 @@
 package com.senacor.schnaufr.user
 
+import com.netifi.broker.BrokerClient
 import com.senacor.schnaufr.UUID
 import io.rsocket.*
 import io.rsocket.exceptions.ApplicationErrorException
@@ -37,11 +38,16 @@ class SchnauferSpek : Spek({
         val rSocket: RSocket by memoized(
             mode = CachingMode.SCOPE,
             factory = {
-                RSocketFactory
-                    .connect()
-                    .transport(TcpClientTransport.create(9090))
-                    .start()
-                    .block()
+
+                BrokerClient.tcp()
+                    .group("quickstart.clients")
+                    .destination("client1")
+                    .accessKey(9007199254740991L)
+                    .accessToken("kTBDVtfRBO4tHOnZzSyY5ym2kfY=")
+                    .host("localhost")
+                    .port(8001)
+                    .build()
+                    .groupServiceSocket("quickstart.services.schnaufr")
             },
             destructor = { it.onClose().block() }
         )

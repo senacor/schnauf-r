@@ -62,7 +62,7 @@ dependencies {
 //    implementation 'io.rsocket.kotlin:rsocket-transport-netty:0.9.6'
     implementation 'io.rsocket:rsocket-core:0.12.2-RC3'
     implementation 'io.rsocket:rsocket-transport-netty:0.12.2-RC3'
-
+    implementation group: 'com.netifi', name: 'netifi-broker-client', version: '1.6.4'
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
     runtimeOnly group: 'ch.qos.logback', name: 'logback-classic', version: logback_version

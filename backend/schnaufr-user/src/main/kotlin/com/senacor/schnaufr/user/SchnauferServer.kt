@@ -1,7 +1,7 @@
 package com.senacor.schnaufr.user
 
+import com.netifi.broker.BrokerClient
 import io.rsocket.*
-import io.rsocket.transport.netty.server.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 
@@ -13,26 +13,37 @@ class SchnauferServer(
         val logger = LoggerFactory.getLogger(SchnauferServer::class.java)
     }
 
-    private var closeable: CloseableChannel? = null
+    private lateinit var brokerClient: BrokerClient
 
     fun start() {
-        closeable = RSocketFactory
-            .receive()
-            .acceptor(this::handler)
-            .transport(TcpServerTransport.create(9090))
-            .start()
-            .doOnSuccess { logger.info("Server started") }
-            .block()
+        // Build Netifi Netifi Connection
+        brokerClient = BrokerClient.tcp()
+            .disableSsl()
+            .group("quickstart.services.schnaufr")
+            .destination("schnaufer-user")
+            .accessKey(9007199254740991L)
+            .accessToken("kTBDVtfRBO4tHOnZzSyY5ym2kfY=")
+            .host("localhost")
+            .port(8001)
+            .build()
+
+        brokerClient
+            .addNamedRSocket("schnaufer-socket", messageHandler)
+            .groupServiceSocket("quickstart.services.schnaufr")
     }
 
     fun stop() {
-        closeable?.dispose()
         logger.info("Server stopped")
     }
 
     fun handler(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
         logger.info("received setup {}", setup)
         return Mono.just(messageHandler)
+    }
+}
+
+class SchnauferServerNetifi {
+    fun start() {
     }
 }
 
