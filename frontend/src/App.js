@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Redirect}  from 'react-router-dom';
+import {Container} from 'react-bootstrap';
 import Login from './login/Login';
 import SchnaufFeedContainer from './schnaufFeed/SchnaufFeedContainer';
 import Navigation from './navigation/Navigation';
@@ -19,18 +20,20 @@ class App extends Component {
     history.push('/feed');
   }
   render() {
-    return (
+    return  (
       <Router>
-        <Navigation/>
-        <Route path="/login" render ={ (props) =>
-          <Login
-            onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
-          />
-        }/>
-        <Route path="/feed" render ={ () =>
-          <SchnaufFeedContainer />
-        }/>
-        {!this.state.isLoggedIn  && <Redirect to = "login"/>}
+        <Navigation isLoggedIn={this.state.isLoggedIn}/>
+        <Container>
+          <Route path="/login" render ={ (props) =>
+            <Login
+              onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
+            />
+          }/>
+          <Route path="/feed" render ={ () =>
+            <SchnaufFeedContainer />
+          }/>
+          {!this.state.isLoggedIn  && <Redirect to = "login"/>}
+        </Container>
       </Router>
     )
   }
