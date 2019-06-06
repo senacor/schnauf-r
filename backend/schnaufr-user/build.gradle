@@ -27,9 +27,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt' version '1.3.31'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '5.0.0'
-
 }
-
 
 repositories {
     mavenCentral()
@@ -58,10 +56,12 @@ dependencies {
     kapt group: 'com.squareup.moshi', name: 'moshi-kotlin-codegen', version: moshi_version
 
     implementation group: 'org.litote.kmongo', name: 'kmongo-async', version: kmongo_version
-    implementation group: 'org.litote.kmongo', name: 'kmongo-rxjava2', version: kmongo_version
+//    implementation group: 'org.litote.kmongo', name: 'kmongo-rxjava2', version: kmongo_version
 
-    implementation 'io.rsocket.kotlin:rsocket-core:0.9.6'
-    implementation 'io.rsocket.kotlin:rsocket-transport-netty:0.9.6'
+//    implementation 'io.rsocket.kotlin:rsocket-core:0.9.6'
+//    implementation 'io.rsocket.kotlin:rsocket-transport-netty:0.9.6'
+    implementation 'io.rsocket:rsocket-core:0.12.2-RC3'
+    implementation 'io.rsocket:rsocket-transport-netty:0.12.2-RC3'
 
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4j_version
@@ -129,11 +129,9 @@ test {
 }
 
 
-
 application {
     mainClassName = 'com.senacor.schnaufr.Bootstrap'
 }
-
 
 shadowJar {
     archiveClassifier = 'fat'

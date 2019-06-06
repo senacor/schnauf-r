@@ -1,10 +1,9 @@
 package com.senacor.schnaufr.user
 
-import io.reactivex.*
-import io.reactivex.disposables.Disposable
-import io.rsocket.kotlin.*
-import io.rsocket.kotlin.transport.netty.server.*
+import io.rsocket.*
+import io.rsocket.transport.netty.server.*
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
 
 class SchnauferServer(
     private val messageHandler: MessageHandler
@@ -12,28 +11,28 @@ class SchnauferServer(
 
     companion object {
         val logger = LoggerFactory.getLogger(SchnauferServer::class.java)
-        const val FIND_USER_COMMAND = "findUser"
     }
 
-    private lateinit var disposable: Disposable
+    private var closeable: CloseableChannel? = null
 
     fun start() {
-        disposable = RSocketFactory
+        closeable = RSocketFactory
             .receive()
-            .acceptor { { setup, rSocket -> handler(setup, rSocket) } } // server handler RSocket
+            .acceptor(this::handler)
             .transport(TcpServerTransport.create(9090))
             .start()
             .doOnSuccess { logger.info("Server started") }
-            .subscribe()
+            .block()
     }
 
     fun stop() {
-        disposable.dispose()
+        closeable?.dispose()
+        logger.info("Server stopped")
     }
 
-    fun handler(setup: Setup, rSocket: RSocket): Single<RSocket> {
+    fun handler(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
         logger.info("received setup {}", setup)
-        return Single.just(messageHandler)
+        return Mono.just(messageHandler)
     }
 }
 

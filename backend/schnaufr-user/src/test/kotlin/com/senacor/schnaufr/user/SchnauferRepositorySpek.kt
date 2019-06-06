@@ -2,10 +2,9 @@ package com.senacor.schnaufr.user
 
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper
 import com.senacor.schnaufr.UUID
-import org.litote.kmongo.rxjava2.blockingAwait
-import org.litote.kmongo.rxjava2.blockingGet
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import reactor.core.publisher.toMono
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import java.io.File
@@ -22,14 +21,14 @@ class SchnauferRepositorySpek : Spek({
         val sut by memoized { SchnauferRepository(client) }
 
         before {
-            database.createCollection("schnaufers").blockingAwait()
+            database.createCollection("schnaufers").toMono().block()
         }
 
         it("can read schnaufers") {
             val schaufer = Schnaufer(id = UUID(), avatarId = UUID(), username = "momann", displayName = "Moni")
-            sut.create(schaufer).blockingGet()
+            sut.create(schaufer).block()
 
-            val result = sut.read(schaufer.id).blockingGet()
+            val result = sut.read(schaufer.id).block()
             expectThat(result.displayName).isEqualTo("Moni")
         }
 
@@ -37,12 +36,12 @@ class SchnauferRepositorySpek : Spek({
             val file = File("/home/mpeters/Downloads/VID_20190603_073254.mp4")
             val inputStream = FileInputStream(file)
             val schnauferId = UUID()
-            sut.saveAvatar(schnauferId, inputStream).blockingGet()
+            sut.saveAvatar(schnauferId = schnauferId, data = inputStream).block()
 
             val outputStream = AsyncStreamHelper.toAsyncOutputStream(FileOutputStream(File("./test.mp4")))
             sut.readAvatar(schnauferId, outputStream).map {
-                it.blockingGet()
-            }.blockingGet()
+                it.toMono().block()
+            }.block()
 
             outputStream.close()
         }
