@@ -12,7 +12,7 @@ import java.util.*
 class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnaufrClient: SchnaufrClient) : AbstractRSocket() {
     override fun requestStream(payload: Payload): Flowable<Payload> {
         return schnaufClient.getAllSchnaufs()
-                .flatMapSingle { enrichWithSchnaufrInformation(it) }
+                // .flatMapSingle { enrichWithSchnaufrInformation(it) }
                 .map { it.asPayload() }
     }
 

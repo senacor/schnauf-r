@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
 object Bootstrap {
-
     val logger: Logger = LoggerFactory.getLogger(Bootstrap::class.java)
     var disposable: Disposable? = null
 
