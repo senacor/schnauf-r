@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schnauf-command
+  labels:
+    app: schnauf-command
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: schnauf-command
+  template:
+    metadata:
+      labels:
+        app: schnauf-command
+    spec:
+      containers:
+        - name: schnauf-command
+          image: gcr.io/main-stack-241307/schnauf-command
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+          ports:
+            - name: tcp-app
+              containerPort: 8080
+          env:
+            - name: MONGO_HOST
+              value: mongo-0.mongo,mongo-1.mongo,mongo-2.mongo
+          terminationMessagePath: /dev/stdout
