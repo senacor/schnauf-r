@@ -2,6 +2,7 @@ package com.senacor.schnaufr.schnauf
 
 import com.senacor.schnaufr.*
 import com.senacor.schnaufr.model.CreateSchnaufRequest
+import com.senacor.schnaufr.model.Schnauf
 import io.rsocket.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

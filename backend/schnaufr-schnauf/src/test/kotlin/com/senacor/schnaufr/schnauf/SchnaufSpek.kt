@@ -2,6 +2,7 @@ package com.senacor.schnaufr.schnauf
 
 import com.senacor.schnaufr.*
 import com.senacor.schnaufr.model.CreateSchnaufRequest
+import com.senacor.schnaufr.model.Schnauf
 import io.rsocket.*
 import io.rsocket.exceptions.ApplicationErrorException
 import io.rsocket.transport.netty.client.TcpClientTransport
@@ -14,7 +15,6 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
-import java.util.*
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 

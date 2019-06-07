@@ -4,13 +4,13 @@ import com.mongodb.BasicDBObject
 import com.mongodb.client.model.Filters
 import com.mongodb.client.result.DeleteResult
 import com.mongodb.reactivestreams.client.MongoClient
+import com.senacor.schnaufr.model.Schnauf
 import org.bson.BsonDocument
 import org.bson.conversions.Bson
 import org.litote.kmongo.contains
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.litote.kmongo.size
-import org.reactivestreams.Publisher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.*

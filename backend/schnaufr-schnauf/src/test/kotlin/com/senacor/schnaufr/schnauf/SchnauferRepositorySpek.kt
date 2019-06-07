@@ -1,6 +1,7 @@
 package com.senacor.schnaufr.schnauf
 
 import com.senacor.schnaufr.*
+import com.senacor.schnaufr.model.Schnauf
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import strikt.api.expectThat
