@@ -1,21 +1,23 @@
 package com.senacor.schnaufr.schnauf
 
-import com.senacor.schnaufr.*
+import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.model.CreateSchnaufRequest
 import com.senacor.schnaufr.model.Schnauf
-import io.rsocket.*
+import com.senacor.schnaufr.mongoDB
+import io.rsocket.RSocket
+import io.rsocket.RSocketFactory
 import io.rsocket.exceptions.ApplicationErrorException
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util.DefaultPayload
 import org.awaitility.Awaitility.await
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import reactor.test.*
+import reactor.test.test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 const val PORT: Int = 8090
@@ -107,14 +109,13 @@ class SchnaufSpek : Spek({
                 rSocket.requestStream(getAllPayload)
                         .take(5)
                         .test()
-//                    .thenAwait()
-//                    .expectNextCount(1)
-//                    .expectNextMatches { payload ->
-//                        val schnauf = Schnauf.fromPayload(payload)
-//                        schnauf.submitter == submitter && schnauf.title == title
-//                    }
-//                    .expectComplete()
-//                    .verify()
+                        .thenAwait()
+                        .expectNextMatches {
+                            val schnauf = Schnauf.fromPayload(it)
+                            schnauf.submitter == submitter && schnauf.title == title
+                        }
+                        .expectComplete()
+                        .verify()
             }
 
             // we can't test watching new schnaufs b/c this would require to spin up a Mongo replica set locally.
@@ -143,10 +144,10 @@ class SchnaufSpek : Spek({
                 rSocket.requestStream(getAllPayload)
                         .take(5)
                         .test()
-
-//                        .awaitCount(3)
-//                        .assertValueCount(3)
-//                        .assertComplete()
+                        .thenAwait()
+                        .expectNextCount(3)
+                        .expectComplete()
+                        .verify()
             }
         }
     }
