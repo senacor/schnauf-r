@@ -15,6 +15,7 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
     override fun requestResponse(payload: Payload): Mono<Payload> {
         logger.info("received payload '{}' with metadata '{}'", payload.dataUtf8, payload.metadataUtf8)
 
+
         return when (payload.operation) {
             "findUserByUsername" -> {
                 Mono.defer {

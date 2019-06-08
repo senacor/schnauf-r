@@ -21,14 +21,11 @@ const createSubscription = (flowable, {onNext, onError, onLimitReached}, request
   return  subscription.cancel;
 };
 
-const createRequestStreamClient = (requestSize) => (socket) => {
-
-  const subscribe = (callbacks) => {
-    const flowable = socket.requestStream({ data: {}});
+const createRequestStreamSubscriber =  (socket) => {
+  return (requestData, requestSize, callbacks) => {
+    const flowable = socket.requestStream(requestData);
     return createSubscription(flowable, callbacks, requestSize);
   };
-
-  return subscribe
 }
 
-export default createRequestStreamClient
+export default createRequestStreamSubscriber
