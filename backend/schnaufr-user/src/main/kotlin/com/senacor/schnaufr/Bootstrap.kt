@@ -38,9 +38,9 @@ object Bootstrap {
             server.start()
             logger.info("Application started")
             logger.info("Creating initial users")
-            DefaultSchnaufer.allSchnaufer.map {
+            DefaultSchnaufer.allSchnaufer.forEach {
                 schnauferRepository.create(it).block()
-                schnauferRepository.saveAvatar(avatarId = it.avatarId, data = Bootstrap::class.java.getResourceAsStream("/avatars/${it.username}")).block()
+                schnauferRepository.saveAvatar(avatarId = it.avatarId, data = Bootstrap::class.java.getResourceAsStream("/avatars/${it.username}.jpg")).block()
             }
             logger.info("Created initial users")
             Thread.currentThread().join()
