@@ -22,7 +22,7 @@ class SchnaufRAvatar extends  Component {
     const requestData = {data: {id : avatarId}, metadata: {operation: 'findAvatar'}}
     createRequestStreamBinary().then((subscribe) => {
       subscribe(requestData, 100, {
-        onNext: (data) => console.log('DATA', DATA),
+        onNext: (data) => console.log('DATA', data),
         onError: console.error,
         onLimitReached: () => console.log('Limit reached')
       })
