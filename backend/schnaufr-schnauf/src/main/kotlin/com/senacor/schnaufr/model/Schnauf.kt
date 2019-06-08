@@ -6,17 +6,24 @@ import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
 import java.time.Instant
 import java.util.*
+import com.mongodb.client.model.geojson.Point
 
 data class Schnauf(
         val id: UUID,
         val title: String,
         val submitter: UUID,
         val recipients: List<UUID> = listOf(),
+        val location: Point? = null,
         val timestamp: Instant = Instant.now()
 ) {
 
     companion object {
-        fun fromRequest(request: CreateSchnaufRequest): Schnauf = Schnauf(UUID(), request.title, request.submitter, request.recipients)
+        fun fromRequest(request: CreateSchnaufRequest): Schnauf = Schnauf(
+                UUID(),
+                request.title,
+                request.submitter,
+                request.recipients,
+                request.location)
         private fun fromJson(value: String): Schnauf = JsonSerializer.fromJson(value)
         fun fromPayload(payload: Payload): Schnauf = fromJson(payload.dataUtf8)
     }

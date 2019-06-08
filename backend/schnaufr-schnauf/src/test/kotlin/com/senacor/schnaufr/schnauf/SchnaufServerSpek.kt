@@ -19,6 +19,8 @@ import strikt.assertions.isEqualTo
 import strikt.assertions.message
 import java.util.*
 import java.util.concurrent.TimeUnit
+import com.mongodb.client.model.geojson.Point
+import com.mongodb.client.model.geojson.Position
 
 const val PORT: Int = 8090
 
@@ -31,8 +33,8 @@ class SchnaufSpek : Spek({
         val server by memoized { SchnaufServer(messageHandler, PORT) }
         lateinit var rSocket: RSocket
 
-        fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf()): Schnauf {
-            val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients)
+        fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf(), location: Point? = null): Schnauf {
+            val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients, location)
             val createPayload = DefaultPayload.create(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
             val addResponse = rSocket.requestResponse(createPayload).block()!!
             return Schnauf.fromPayload(addResponse)
@@ -76,11 +78,13 @@ class SchnaufSpek : Spek({
             it("should create a new schnauf") {
                 val title = "first-schnauf"
                 val submitter = UUID()
+                val location = Point(Position(39.039219, 125.762527))
                 val createdSchnauf = createSchnauf(title, submitter)
 
                 // assert creation
                 expectThat(createdSchnauf.title).isEqualTo(title)
                 expectThat(createdSchnauf.submitter).isEqualTo(submitter)
+                expectThat(createdSchnauf.location).isEqualTo(location)
 
                 await().atMost(5, TimeUnit.SECONDS).until {
                     schnaufRepository.readLatest(limit = 10).collectList().block()!!.isNotEmpty()

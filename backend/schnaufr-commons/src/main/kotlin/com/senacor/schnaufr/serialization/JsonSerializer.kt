@@ -13,6 +13,7 @@ public object JsonSerializer {
         moshi = Moshi.Builder()
                 .add(UUIDAdapter)
                 .add(InstantAdapter)
+                .add(PointAdapter)
                 .build()
     }
 
