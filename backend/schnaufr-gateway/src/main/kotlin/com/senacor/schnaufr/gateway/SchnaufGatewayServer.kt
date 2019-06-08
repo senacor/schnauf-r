@@ -12,12 +12,11 @@ class SchnaufGatewayServer(private val gatewayMessageHandler: SchnaufGatewayMess
 
     private var closeable: CloseableChannel? = null
 
-
     fun start() {
         closeable = RSocketFactory
             .receive()
             .acceptor(this::handler)
-            .transport(TcpServerTransport.create(port))
+            .transport(WebsocketServerTransport.create(port))
             .start()
             .doOnSuccess { logger.info("Server started") }
             .block()
