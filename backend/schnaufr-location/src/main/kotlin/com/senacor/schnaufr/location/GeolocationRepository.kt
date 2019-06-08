@@ -9,10 +9,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.EmitterProcessor
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.core.publisher.*
 import java.util.*
 
 class GeolocationRepository(client: MongoClient) {
@@ -23,10 +20,13 @@ class GeolocationRepository(client: MongoClient) {
     private val collection = database.getCollection<SchnaufrLocation>()
 
     fun upsert(schnaufr: SchnaufrLocation): Mono<UpdateResult> {
-        logger.debug("Saving schnaufr location $schnaufr")
         return collection
                 .updateOneById(schnaufr.id, schnaufr, UpdateOptions().upsert(true))
                 .toMono()
+    }
+
+    fun readAll(): Flux<SchnaufrLocation> {
+        return collection.find().toFlux();
     }
 
     fun readById(id: UUID): Mono<SchnaufrLocation> {

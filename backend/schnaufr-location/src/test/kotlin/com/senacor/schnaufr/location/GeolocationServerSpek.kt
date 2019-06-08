@@ -5,6 +5,7 @@ import io.rsocket.Payload
 import io.rsocket.RSocket
 import io.rsocket.RSocketFactory
 import io.rsocket.transport.netty.client.TcpClientTransport
+import org.awaitility.Awaitility.await
 import org.reactivestreams.Publisher
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -12,6 +13,7 @@ import reactor.core.publisher.Flux
 import reactor.test.test
 import java.time.Instant
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class GeolocationServerSpek : Spek({
@@ -25,7 +27,7 @@ class GeolocationServerSpek : Spek({
 
         lateinit var rSocket: RSocket
 
-        before {
+        beforeEach {
             sut.start()
             rSocket = RSocketFactory
                     .connect()
@@ -33,11 +35,9 @@ class GeolocationServerSpek : Spek({
                     .start()
                     .block()!!
         }
-        after {
-            sut.stop()
-        }
 
         afterEach {
+            sut.stop()
             geolocationRepository.deleteAll()
         }
 
@@ -45,18 +45,17 @@ class GeolocationServerSpek : Spek({
 
             it("does broadcast the update to clients") {
 
-                val requestStream: Publisher<Payload> = Flux.range(0, 1)
-                        .map {
-                            SchnaufrLocation(
-                                    UUID.randomUUID(),
-                                    Geolocation(23.0, 42.0, Instant.now())
-                            ).asPayload()
-                        }
+                val requestStream: Publisher<Payload> = Flux.just(
+                        SchnaufrLocation(
+                                UUID.randomUUID(),
+                                Geolocation(23.0, 42.0, Instant.now())
+                        ).asPayload()
+                )
 
                 rSocket.requestChannel(requestStream)
                         .doOnNext { println("Client received Schnaufr Position $it") }
                         .map { SchnaufrLocation.fromJson(it.dataUtf8) }
-                        .take(0)
+                        .take(1)
                         .test()
                         .thenAwait()
                         .expectNextMatches { schnaufr ->
@@ -66,6 +65,9 @@ class GeolocationServerSpek : Spek({
                         .expectComplete()
                         .verify()
 
+                await().atMost(5, TimeUnit.SECONDS).until {
+                    geolocationRepository.readAll().collectList().block()!!.isNotEmpty()
+                }
             }
         }
     }

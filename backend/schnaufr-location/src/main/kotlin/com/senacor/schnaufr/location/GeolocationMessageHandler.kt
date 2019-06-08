@@ -4,15 +4,15 @@ import io.rsocket.AbstractRSocket
 import io.rsocket.Payload
 import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.EmitterProcessor
 import reactor.core.publisher.Flux
-import java.time.Duration
+import reactor.core.publisher.TopicProcessor
+import reactor.core.scheduler.Schedulers
 
 class GeolocationMessageHandler(private val repository: GeolocationRepository) : AbstractRSocket() {
 
     private val logger = LoggerFactory.getLogger(GeolocationMessageHandler::class.java)
 
-    private var locationUpdatesEmitter = EmitterProcessor.create<SchnaufrLocation>()
+    private val locationUpdatesEmitter = TopicProcessor.create<SchnaufrLocation>()
 
     override fun requestChannel(locationUpdatesPublisher: Publisher<Payload>): Flux<Payload> {
         logger.info("Channel requested")
@@ -24,6 +24,7 @@ class GeolocationMessageHandler(private val repository: GeolocationRepository) :
     private fun registerLocationUpdatePublisher(receivedPayloads: Publisher<Payload>) {
         Flux.from(receivedPayloads)
                 .map { payload -> SchnaufrLocation.fromJson(payload.dataUtf8) }
+                .subscribeOn(Schedulers.elastic())
                 .subscribe(this::handleLocationUpdate)
     }
 
@@ -34,6 +35,6 @@ class GeolocationMessageHandler(private val repository: GeolocationRepository) :
 
         repository.upsert(locationUpdate)
                 .doOnSuccess { logger.info("Location update saved: $locationUpdate") }
-                .block(Duration.ofSeconds(3))
+                .block()
     }
 }

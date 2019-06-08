@@ -2,6 +2,8 @@ dependencies {
     implementation project(':schnaufr-commons')
 
     testImplementation project(':schnaufr-commons-test')
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
+
 }
 
 jib {
