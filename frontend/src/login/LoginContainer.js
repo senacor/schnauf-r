@@ -12,8 +12,12 @@ class LoginContainer extends Component {
 
   login = async (username) => {
     const {rSocketClient} = this.props
-    const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
-    this.props.onLoginSuccess(result.data.id)
+    try {
+      const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
+      this.props.onLoginSuccess(result.data.id)
+    } catch (e) {
+      alert(`error while trying to retrieve user: ${e}`)
+    }
   }
 
   render() {
