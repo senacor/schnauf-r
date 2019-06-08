@@ -17,14 +17,19 @@ export default class Login extends Component {
     })
   }
 
+  submit = (event) => {
+    event.preventDefault();
+    this.props.onLogin(this.state.username);
+  }
+
   render() {
     return (
-      <Form>
+      <Form onSubmit={this.submit}>
         <Form.Group controlId="formLogin">
           <Form.Label>Username</Form.Label>
           <Form.Control type="text" placeholder="Username" onChange={this.setUserName} value={this.state.username}/>
         </Form.Group>
-        <Button variant="primary" type="submit" onClick={() => this.props.onLogin(this.state.username)} disabled={!this.state.username}>
+        <Button variant="primary" type="submit"  disabled={!this.state.username}>
           Go and schnauf
         </Button>
       </Form>

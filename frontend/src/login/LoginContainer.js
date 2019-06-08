@@ -11,8 +11,8 @@ class LoginContainer extends Component {
   }
 
   login = async (username) => {
-   // const client = await rSocketClient({url: 'ws://127.0.0.1:8080'})
-   // const result = await client.requestResponse({ data: { username }})
+    // const client = await rSocketClient({url: 'ws://127.0.0.1:8080'})
+    // const result = await client.requestResponse({ data: { username }})
     this.props.onLoginSuccess(username)
   }
 

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Redirect}  from 'react-router-dom';
 import {Container} from 'react-bootstrap';
-import Login from './login/Login';
+import LoginContainer from './login/LoginContainer';
 import SchnaufFeedContainer from './schnaufFeed/SchnaufFeedContainer';
 import Navigation from './navigation/Navigation';
 import NotificationProvider from './NotificationProvider';
@@ -9,7 +9,6 @@ import NotificationProvider from './NotificationProvider';
 class App extends Component {
   state = {
     isLoggedIn : false,
-    notification: null
   }
 
   onLoginSuccess = (username, {history}) => {
@@ -31,7 +30,7 @@ class App extends Component {
             {notification}
             <Container>
               <Route path="/login" render={(props) =>
-                <Login
+                <LoginContainer
                   onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
                 />
               }/>
