@@ -23,7 +23,8 @@ spec:
         - name: artifactory
       containers:
         - name: schnauf-query
-          image: gcr.io/main-stack-241307/query-schnauf
+          imagePullPolicy: Always
+          image: gcr.io/main-stack-241307/schnauf-query
           resources:
             limits:
               cpu: 500m
@@ -31,6 +32,9 @@ spec:
             requests:
               cpu: 200m
               memory: 200Mi
+          envFrom:
+            - configMapRef:
+                name: schnauf-query-config
           ports:
             - name: tcp-app
               containerPort: 8080

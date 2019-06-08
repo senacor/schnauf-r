@@ -38,6 +38,7 @@ class SchnauferClient {
         return rsocket.flatMap { rsocket ->
             rsocket.requestResponse(DefaultPayload.create(id.toString(), MetaData(FIND_USER_COMMAND).toJson()))
                     .map { Schnaufr.fromJson(it.dataUtf8) }
+                    .onErrorReturn(Schnaufr.defaultSchnaufr)
         };
     }
 
