@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 import java.util.stream.Stream
 
-class  SchnauferRepository(private val client: MongoClient) {
+class SchnauferRepository(private val client: MongoClient) {
 
     companion object {
         val logger = LoggerFactory.getLogger(SchnauferRepository::class.java)
