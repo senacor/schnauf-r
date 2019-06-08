@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Spinner, Row} from 'react-bootstrap';
 import SchnaufFeed from './SchnaufFeed';
-import createRSocketClient from '../rsocket/rSocketClient'
 import {withNotification} from '../NotificationProvider';
+import {withRSocketClient} from '../rsocket/RSocketClientProvider'
 import PropTypes from 'prop-types';
 
 class SchnaufFeedContainer extends Component {
@@ -37,17 +37,17 @@ class SchnaufFeedContainer extends Component {
     setTimeout(requestNext, 2000);
   }
 
-  componentDidMount = async () => {
-    try {
-      const { subscribeRequestStream } = await createRSocketClient('ws://127.0.0.1:8080')
-      this.unsubscribe = subscribeRequestStream({
-        onNext: this.onNext,
-        onError: this.onError,
-        onLimitReached: this.onLimitReached,
-      });
-    } catch (error) {
-      this.onError();
-    }
+  componentDidMount() {
+    const {rSocketClient} = this.props;
+      const requestSize = 1
+      const requestData = {data: {}}
+
+      this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{
+      onNext: this.onNext,
+      onError: this.onError,
+      onLimitReached: this.onLimitReached,
+    });
+
   }
 
   componentWillUnmount = () => {
@@ -70,7 +70,8 @@ class SchnaufFeedContainer extends Component {
 }
 
 SchnaufFeedContainer.propTypes = {
-  addNotification: PropTypes.func.isRequired // injected by withNotification
+  addNotification: PropTypes.func.isRequired,  // injected by withNotification
+  rSocketClient: PropTypes.object.isRequired, // injected by withRSocketClient
 };
 
-export default withNotification(SchnaufFeedContainer);
+export default withNotification(withRSocketClient(SchnaufFeedContainer));
