@@ -4,6 +4,7 @@ const createSubscription = (flowable,requestSize, {onNext, onError, onLimitReach
 
   flowable.subscribe({
     onNext: (response) => {
+      console.log('ON NEXT ', response)
       subscriptionCounter++
       if (subscriptionCounter >= requestSize) {
         subscriptionCounter = 0
@@ -14,11 +15,12 @@ const createSubscription = (flowable,requestSize, {onNext, onError, onLimitReach
     onError: onError,
     onSubscribe: (sub) => {
       subscription = sub
+      console.log('ON SUBSCRIBE ')
       sub.request(requestSize)
     }
   })
 
-  return  subscription.cancel
+  return subscription.cancel
 }
 
 const createRequestStreamSubscriber =  (socket) => {

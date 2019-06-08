@@ -2,12 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Image, Row, Col } from 'react-bootstrap'
 import picture from '../../public/momann.jpeg'
+import SchnaufRAvatar from './SchnaufRAvatar'
 
 const SchnaufFeedEntry = ({schnauf}) =>
   <Card>
     <Row>
       <Col md={2}>
-        <Image src={picture} roundedCircle  />
+        <SchnaufRAvatar avatarId={schnauf.author.avatarId}/>
       </Col>
       <Col md={{ span: 9, offset: 1 }}>
         <Card.Body>

@@ -22,6 +22,7 @@ class App extends Component {
   }
 
   onLoginSuccess = (user, {history}) => {
+
     this.setState((prevState) => ({
       ... prevState,
       isLoggedIn: true,
