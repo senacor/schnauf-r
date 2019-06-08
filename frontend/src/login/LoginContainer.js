@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
-import createRSocketClient from '../rsocket/rSocketClient'
+import {withRSocketClient} from '../rsocket/RSocketClientProvider'
 import Login from './Login';
 
 class LoginContainer extends Component {
@@ -11,9 +11,8 @@ class LoginContainer extends Component {
   }
 
   login = async (username) => {
-    const { requestResponse } = await createRSocketClient('ws://35.246.79.96:8080')
-    const result = await requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
-    console.log(result)
+    const {rSocketClient} = this.props;
+    const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
     this.props.onLoginSuccess(username)
   }
 
@@ -25,9 +24,10 @@ class LoginContainer extends Component {
 
 }
 
-export default LoginContainer;
-
 LoginContainer.propTypes = {
-  onLoginSuccess: PropTypes.func.isRequired
+  onLoginSuccess: PropTypes.func.isRequired,
+  rSocketClient: PropTypes.object.isRequired,
 };
+
+export default withRSocketClient(LoginContainer);
 

@@ -6,6 +6,7 @@ import SchnaufFeedContainer from './schnaufFeed/SchnaufFeedContainer';
 import Navigation from './navigation/Navigation';
 import NotificationProvider from './NotificationProvider';
 import SchnaufFormContainer from './schnaufForm/SchnaufFormContainer';
+import RSocketClientProvider from './rsocket/RSocketClientProvider';
 
 const PATHS = {
   LOGIN: '/login',
@@ -13,7 +14,7 @@ const PATHS = {
   SCHNAUF: '/feed/schnauf',
 }
 
-const WSSOCKET_URL = 'ws://35.246.79.96:8080';
+const WS_SOCKET_URL = 'ws://35.246.79.96:8080';
 
 class App extends Component {
   state = {
@@ -49,20 +50,22 @@ class App extends Component {
             <Navigation loggedIn={this.state.isLoggedIn}/>
             {notification}
             <Container>
-              <Route path={PATHS.LOGIN} render={(props) =>
-                <LoginContainer
-                  onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
-                />
-              }/>
-              <Route exact path={PATHS.FEED} render={() => (<SchnaufFeedContainer/>)}/>
-              <Route exact path={PATHS.SCHNAUF} render={(props) =>
-                <SchnaufFormContainer
-                  userId={this.state.userId}
-                  onSchnaufSuccess={this.navigateTo(props, '/feed')}
-                  onSchnaufError={this.logout}
-                />
-              } />
-              {!this.state.isLoggedIn && <Redirect to={PATHS.LOGIN}/>}
+              <RSocketClientProvider wsSocketUrl={WS_SOCKET_URL}>
+                <Route path={PATHS.LOGIN} render={(props) =>
+                  <LoginContainer
+                    onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
+                  />
+                }/>
+                <Route exact path={PATHS.FEED} render={() => (<SchnaufFeedContainer/>)}/>
+                <Route exact path={PATHS.SCHNAUF} render={(props) =>
+                  <SchnaufFormContainer
+                    userId={this.state.userId}
+                    onSchnaufSuccess={this.navigateTo(props, '/feed')}
+                    onSchnaufError={this.logout}
+                  />
+                } />
+                {!this.state.isLoggedIn && <Redirect to={PATHS.LOGIN}/>}
+              </RSocketClientProvider>
             </Container>
           </Router>
         )}
