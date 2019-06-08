@@ -1,5 +1,6 @@
 package com.senacor.schnaufr.schnauf.query.model
 
+import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.serialization.JsonSerializer
 import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
@@ -9,6 +10,7 @@ data class Schnaufr(val id: UUID, val avatarId: UUID, val username: String, val 
 
     companion object {
         fun fromJson(value: String): Schnaufr = JsonSerializer.fromJson(value)
+        val defaultSchnaufr = Schnaufr(UUID(), UUID(), "anonymous-schnaufer", "Anonymous")
     }
 
     fun toJson(): String = JsonSerializer.toJsonString(this)

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, Image, Row , Col} from 'react-bootstrap'
+import { Card, Image, Row, Col } from 'react-bootstrap'
 import picture from '../../public/momann.jpeg'
 
 const SchnaufFeedEntry = ({schnauf}) =>

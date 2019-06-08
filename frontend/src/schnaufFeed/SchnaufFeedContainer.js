@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Spinner, Row, Alert} from 'react-bootstrap';
+import {Spinner, Row} from 'react-bootstrap';
 import SchnaufFeed from './SchnaufFeed';
-import createRequestStreamClient from '../requestStreamClient'
-import createRSocket from '../rSocketClient'
-import {withNotification} from '../NotificationContext';
+import createRSocketClient from '../rsocket/rSocketClient'
+import {withNotification} from '../NotificationProvider';
+import PropTypes from 'prop-types';
 
 class SchnaufFeedContainer extends Component {
 
@@ -12,7 +12,6 @@ class SchnaufFeedContainer extends Component {
     this.state = {
       schnaufs :[],
       loading: true,
-      error: false,
 
     }
     this.unsubscribe = () => {};
@@ -22,14 +21,13 @@ class SchnaufFeedContainer extends Component {
     this.setState((prevState) => ({
       ...prevState,
       loading: false,
-      error: false,
       schnaufs: [schnauf, ...prevState.schnaufs ]
     }));
   }
 
-  onError = (error) => {
+  onError = () => {
     this.setState((prevState) => ({
-      error: true,
+      ...prevState,
       loading: false
     }));
     this.props.addNotification('Fehler beim Laden');
@@ -41,9 +39,8 @@ class SchnaufFeedContainer extends Component {
 
   componentDidMount = async () => {
     try {
-      const socket = await createRSocket({url: 'ws://127.0.0.1:8080'})
-      const subscribe = await createRequestStreamClient(1)(socket)
-      this.unsubscribe = subscribe({
+      const { subscribeRequestStream } = await createRSocketClient('ws://127.0.0.1:8080')
+      this.unsubscribe = subscribeRequestStream({
         onNext: this.onNext,
         onError: this.onError,
         onLimitReached: this.onLimitReached,
@@ -71,5 +68,9 @@ class SchnaufFeedContainer extends Component {
   }
 
 }
+
+SchnaufFeedContainer.propTypes = {
+  addNotification: PropTypes.func.isRequired // injected by withNotification
+};
 
 export default withNotification(SchnaufFeedContainer);
