@@ -40,3 +40,17 @@ spec:
             - name: tcp-app
               containerPort: 8080
           terminationMessagePath: /dev/stdout
+        - name: schnaufr-frontend
+          imagePullPolicy: Always
+          image: gcr.io/main-stack-241307/schnaufr-frontend
+          resources:
+            limits:
+              cpu: 500m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - name: http-app
+              containerPort: 80
+          terminationMessagePath: /dev/stdout

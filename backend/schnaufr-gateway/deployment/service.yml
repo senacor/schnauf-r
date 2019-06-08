@@ -11,4 +11,7 @@ spec:
     - name: tcp-app
       port: 8080
       targetPort: 8080
+    - name: http-app
+      port: 80
+      targetPort: 80
   loadBalancerIP: 35.246.79.96 # gcloud compute addresses create schnaufr --region europe-west2
