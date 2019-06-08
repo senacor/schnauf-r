@@ -37,7 +37,7 @@ class SchnauferClient {
     fun getSchnaufrById(id: UUID): Mono<Schnaufr> {
         // TODO: what happens if no schnaufr found?
         return rsocket.flatMap { rsocket ->
-            rsocket.requestResponse(DefaultPayload.create(SchnauferByIdRequest(id).toJson(), MetaData(FIND_USER_COMMAND).toJson()))
+            rsocket.requestResponse(DefaultPayload.create(SchnauferByIdRequest(id).toJson(), MetaData(FIND_USER_COMMAND, -1, UUID.randomUUID()).toJson()))
                     .map { Schnaufr.fromJson(it.dataUtf8) }
                     .onErrorReturn(Schnaufr.defaultSchnaufr)
         };
