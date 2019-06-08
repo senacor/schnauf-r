@@ -14,7 +14,7 @@ const PATHS = {
   SCHNAUF: '/feed/schnauf',
 }
 
-const WS_SOCKET_URL = 'ws://35.246.79.96:8080'
+const WS_SOCKET_URL = `ws://schnau.fr:8080`
 
 class App extends Component {
   state = {
