@@ -17,7 +17,8 @@ class GeolocationMessageHandler(private val repository: GeolocationRepository) :
     override fun requestChannel(locationUpdatesPublisher: Publisher<Payload>): Flux<Payload> {
         logger.info("Channel requested")
         registerLocationUpdatePublisher(locationUpdatesPublisher)
-        return Flux.from(locationUpdatesEmitter)
+        return repository.readAll()
+                .concatWith(locationUpdatesEmitter)
                 .map(SchnaufrLocation::asPayload)
     }
 

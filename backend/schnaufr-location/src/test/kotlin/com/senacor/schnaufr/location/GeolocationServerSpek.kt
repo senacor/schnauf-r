@@ -1,12 +1,10 @@
 package com.senacor.schnaufr.location
 
 import com.senacor.schnaufr.mongoDB
-import io.rsocket.Payload
 import io.rsocket.RSocket
 import io.rsocket.RSocketFactory
 import io.rsocket.transport.netty.client.TcpClientTransport
 import org.awaitility.Awaitility.await
-import org.reactivestreams.Publisher
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.Flux
@@ -20,6 +18,8 @@ class GeolocationServerSpek : Spek({
 
     describe("schaufr location API") {
 
+        val initialPositionCount: Long = 10
+
         val mongoConnection by mongoDB(port = 27067)
         val geolocationRepository by memoized { GeolocationRepository(mongoConnection) }
 
@@ -29,6 +29,11 @@ class GeolocationServerSpek : Spek({
 
         beforeEach {
             sut.start()
+
+            1.rangeTo(initialPositionCount).forEach { i ->
+                geolocationRepository.upsert(aLocation(i)).block()
+            }
+
             rSocket = RSocketFactory
                     .connect()
                     .transport(TcpClientTransport.create(8097))
@@ -43,32 +48,41 @@ class GeolocationServerSpek : Spek({
 
         describe("receiving location updates") {
 
-            it("does broadcast the update to clients") {
+            it("does send current locations to new client") {
 
-                val requestStream: Publisher<Payload> = Flux.just(
-                        SchnaufrLocation(
-                                UUID.randomUUID(),
-                                Geolocation(23.0, 42.0, Instant.now())
-                        ).asPayload()
-                )
-
-                rSocket.requestChannel(requestStream)
-                        .doOnNext { println("Client received Schnaufr Position $it") }
+                rSocket.requestChannel(Flux.just(aLocation().asPayload()))
                         .map { SchnaufrLocation.fromJson(it.dataUtf8) }
-                        .take(1)
+                        .take(initialPositionCount)
                         .test()
                         .thenAwait()
-                        .expectNextMatches { schnaufr ->
-                            schnaufr.currentLocation.latitude.equals(23.0)
-                                    && schnaufr.currentLocation.longitude.equals(42.0)
-                        }
+                        .expectNextCount(initialPositionCount)
+                        .expectComplete()
+                        .verify()
+            }
+
+            it("does send new locations to new client") {
+
+                rSocket.requestChannel(Flux.just(aLocation().asPayload()))
+                        .map { SchnaufrLocation.fromJson(it.dataUtf8) }
+                        .take(initialPositionCount)
+                        .test()
+                        .thenAwait()
+                        .expectNextCount(initialPositionCount)
                         .expectComplete()
                         .verify()
 
                 await().atMost(5, TimeUnit.SECONDS).until {
-                    geolocationRepository.readAll().collectList().block()!!.isNotEmpty()
+                    geolocationRepository.readAll().collectList().block()!!.size >= 10
                 }
             }
         }
     }
 })
+
+private fun aLocation() = aLocation(1)
+
+private fun aLocation(n: Long): SchnaufrLocation {
+    return SchnaufrLocation(
+            UUID.randomUUID(),
+            Geolocation(n + .5, n + 1.5, Instant.now()))
+}
