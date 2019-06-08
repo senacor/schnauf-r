@@ -39,7 +39,7 @@ class SchnaufFeedContainer extends Component {
 
   componentDidMount = async () => {
     try {
-      const { subscribeRequestStream } = await createRSocketClient('ws://127.0.0.1:8080')
+      const { subscribeRequestStream } = await createRSocketClient('ws://35.246.79.96:8080')
       const requestSize = 5
       const requestData = {}
       this.unsubscribe = subscribeRequestStream(requestData, requestSize, {
