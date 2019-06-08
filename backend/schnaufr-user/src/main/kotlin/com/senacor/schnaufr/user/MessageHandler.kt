@@ -59,6 +59,7 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
                 Flux.defer {
                     repository.readAvatar(schnauferId)
                         .map { DefaultPayload.create(it) }
+                            .switchIfEmpty(Mono.error<Payload>(RuntimeException("avatarNotFound, id: "+schnauferId)))
                 }
             }
             else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))

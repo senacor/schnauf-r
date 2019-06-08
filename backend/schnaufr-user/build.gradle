@@ -14,6 +14,10 @@ jib {
         ]
     }
     to {
+        auth {
+            username = '_json_key'
+            password = file('../keyfile.json').text
+        }
         image = "gcr.io/main-stack-241307/schnaufr-user:latest"
     }
 }
