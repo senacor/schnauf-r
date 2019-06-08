@@ -1,15 +1,19 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types'
 import SchnaufForm from './SchnaufForm';
+import createRSocketClient from '../rsocket/rSocketClient';
 
 class SchnaufFormContainer extends Component {
 
-   submitSchnauf = (schnaufText) => {
+   submitSchnauf = async (schnaufText) => {
      const {onSchnaufSuccess, onSchnaufError, userId} = this.props;
-     console.log(userId, schnaufText);
-
-     onSchnaufSuccess();
-
+     try {
+       const {requestResponse} = await createRSocketClient('ws://35.246.79.96:8080')
+       await requestResponse({data: {submitter: userId, title: schnaufText}, metadata: {operation: 'createSchnauf'}})
+       onSchnaufSuccess();
+     } catch (error) {
+       onSchnaufError();
+     }
    }
 
    render() {
