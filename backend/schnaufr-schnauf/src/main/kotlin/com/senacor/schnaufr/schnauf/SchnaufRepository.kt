@@ -47,7 +47,7 @@ class SchnaufRepository(private val client: MongoClient) {
         return collection.findOne(Schnauf::id eq id).toMono()
     }
 
-    fun readLatest(limit: Int = 10, principal: UUID? = null): Flux<Schnauf> {
+    fun readLatest(principal: UUID? = null, limit: Int): Flux<Schnauf> {
         return Flux.defer { (collection.find(recipientFilterBson(principal, Schnauf::recipients)).limit(limit)) }
     }
 

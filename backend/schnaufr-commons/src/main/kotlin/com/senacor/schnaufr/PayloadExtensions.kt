@@ -8,12 +8,11 @@ import java.util.UUID
 val Payload.operation: String?
     get() = metadataMap["operation"]
 
-val Payload.principal: UUID
-    get() = if (metadataMap["principal"] != null) UUID.fromString(metadataMap["principal"]!!) else UUID.randomUUID()
+val Payload.principal: UUID?
+    get() = metadataMap["principal"]?.let { UUID.fromString(it) }
 
-
-val Payload.limit: Int
-    get() = if(metadataMap["limit"] != null) metadataMap["limit"]!!.toInt() else -1
+val Payload.limit: Int?
+    get() = metadataMap["limit"]?.let { Integer.parseInt(it) }
 
 private val Payload.metadataMap: Map<String, String>
     get() {
