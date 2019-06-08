@@ -1,25 +1,25 @@
-import React, {Component} from 'react';
-import { Row, Spinner} from 'react-bootstrap';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react'
+import { Row, Spinner} from 'react-bootstrap'
+import PropTypes from 'prop-types'
 
-import createRSocket from './rSocket';
-import createRSocketClient from './rSocketClient';
+import createRSocket from './rSocket'
+import createRSocketClient from './rSocketClient'
 
-const RSocketContext = React.createContext('schnaufr-notification');
+const RSocketContext = React.createContext('schnaufr-notification')
 
 export const withRSocketClient = (Component) => {
   const RSocketWrapper = (props) =>  (
     <RSocketContext.Consumer>
       { (rSocketClient) => <Component rSocketClient={rSocketClient} {... props} />}
     </RSocketContext.Consumer>
-  );
-  return RSocketWrapper;
+  )
+  return RSocketWrapper
 }
 
 class RSocketClientProvider extends Component {
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       rSocketClient: null,
       initialized: false,
@@ -28,12 +28,12 @@ class RSocketClientProvider extends Component {
   }
 
   componentDidMount() {
-    const {wsSocketUrl} = this.props;
+    const {wsSocketUrl} = this.props
 
     createRSocket(wsSocketUrl, {
       onComplete: this.onRSocketInitialized,
       onError: this.onRSocketError
-    });
+    })
   }
 
   onRSocketInitialized  = (rSocket) => {
@@ -41,7 +41,7 @@ class RSocketClientProvider extends Component {
       ... previoutState,
       initialized: true,
       rSocketClient: createRSocketClient(rSocket),
-    }));
+    }))
   }
 
   onRSocketError  = (error) => {
@@ -50,12 +50,12 @@ class RSocketClientProvider extends Component {
       initialized: false,
       rSocketClient: null,
       error: error,
-    }));
+    }))
   }
 
   render() {
     if (this.state.error) {
-      return (<div>{this.state.error}</div>);
+      return (<div>{this.state.error}</div>)
     }
 
     if (!this.state.initialized) {
@@ -63,7 +63,7 @@ class RSocketClientProvider extends Component {
         <Row className="justify-content-md-center">
           <Spinner animation="border" />
         </Row>
-      );
+      )
     }
 
     return (
@@ -80,4 +80,4 @@ RSocketClientProvider.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-export default RSocketClientProvider;
+export default RSocketClientProvider
