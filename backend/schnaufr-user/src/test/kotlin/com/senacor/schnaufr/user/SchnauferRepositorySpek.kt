@@ -1,6 +1,7 @@
 package com.senacor.schnaufr.user
 
 import com.senacor.schnaufr.*
+import com.senacor.schnaufr.user.model.Schnaufer
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.toMono
@@ -10,7 +11,6 @@ import strikt.assertions.*
 class SchnauferRepositorySpek : Spek({
 
     describe("schnaufer master data management") {
-
         val client by mongoDB(port = 27017)
         val database by lazy { client.getDatabase("schnauf") }
 

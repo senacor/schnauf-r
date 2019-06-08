@@ -1,5 +1,7 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
+import com.senacor.schnaufr.query.SchnaufMessageHandler
+import com.senacor.schnaufr.query.SchnaufQueryServer
 import io.mockk.every
 import io.mockk.mockk
 import io.rsocket.RSocketFactory

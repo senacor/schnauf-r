@@ -1,10 +1,9 @@
 package com.senacor.schnaufr
 
-import com.senacor.schnaufr.gateway.SchnaufClient
-import com.senacor.schnaufr.gateway.SchnaufMessageHandler
-import com.senacor.schnaufr.gateway.SchnaufQueryServer
-import com.senacor.schnaufr.gateway.SchnauferClient
-import com.senacor.schnaufr.schnauf.query.*
+import com.senacor.schnaufr.query.SchnaufClient
+import com.senacor.schnaufr.query.SchnaufMessageHandler
+import com.senacor.schnaufr.query.SchnaufQueryServer
+import com.senacor.schnaufr.query.SchnauferClient
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 

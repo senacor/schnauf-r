@@ -1,7 +1,8 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
-import com.senacor.schnaufr.gateway.model.MetaData
-import com.senacor.schnaufr.gateway.model.Schnaufr
+import com.senacor.schnaufr.query.model.MetaData
+import com.senacor.schnaufr.query.model.SchnauferByIdRequest
+import com.senacor.schnaufr.query.model.Schnaufr
 import io.rsocket.*
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util.DefaultPayload
@@ -36,7 +37,7 @@ class SchnauferClient {
     fun getSchnaufrById(id: UUID): Mono<Schnaufr> {
         // TODO: what happens if no schnaufr found?
         return rsocket.flatMap { rsocket ->
-            rsocket.requestResponse(DefaultPayload.create(id.toString(), MetaData(FIND_USER_COMMAND).toJson()))
+            rsocket.requestResponse(DefaultPayload.create(SchnauferByIdRequest(id).toJson(), MetaData(FIND_USER_COMMAND).toJson()))
                     .map { Schnaufr.fromJson(it.dataUtf8) }
                     .onErrorReturn(Schnaufr.defaultSchnaufr)
         };

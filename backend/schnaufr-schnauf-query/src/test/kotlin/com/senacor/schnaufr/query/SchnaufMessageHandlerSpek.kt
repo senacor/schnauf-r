@@ -1,9 +1,13 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
-import com.senacor.schnaufr.gateway.model.Schnauf
-import com.senacor.schnaufr.gateway.model.SchnaufFeedEntry
-import com.senacor.schnaufr.gateway.model.Schnaufr
+import com.senacor.schnaufr.query.SchnaufClient
+import com.senacor.schnaufr.query.SchnaufMessageHandler
+import com.senacor.schnaufr.query.SchnauferClient
+import com.senacor.schnaufr.query.model.MetaData
+import com.senacor.schnaufr.query.model.Schnauf
+import com.senacor.schnaufr.query.model.SchnaufFeedEntry
+import com.senacor.schnaufr.query.model.Schnaufr
 import io.mockk.every
 import io.mockk.mockk
 import io.rsocket.util.DefaultPayload
@@ -30,7 +34,7 @@ class SchnaufMessageHandlerSpek : Spek({
 
 
         it("returns an aggregated stream of schnauf feed entries") {
-            val entries = sut.requestStream(DefaultPayload.create(DefaultPayload.EMPTY_BUFFER)).toIterable().iterator()
+            val entries = sut.requestStream(DefaultPayload.create("", MetaData("getAllSchnaufs").toJson())).toIterable().iterator()
 
             expectThat(entries.hasNext())
             val entry = SchnaufFeedEntry.fromJson(entries.next().dataUtf8)

@@ -1,7 +1,7 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
-import com.senacor.schnaufr.gateway.model.MetaData
-import com.senacor.schnaufr.gateway.model.Schnauf
+import com.senacor.schnaufr.query.model.MetaData
+import com.senacor.schnaufr.query.model.Schnauf
 import io.rsocket.*
 import io.rsocket.transport.netty.client.TcpClientTransport
 import io.rsocket.util.DefaultPayload

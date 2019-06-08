@@ -1,6 +1,8 @@
 package com.senacor.schnaufr.user
 
 import com.senacor.schnaufr.operation
+import com.senacor.schnaufr.user.model.SchnauferByIdRequest
+import com.senacor.schnaufr.user.model.SchnauferByUsernameRequest
 import io.rsocket.*
 import org.slf4j.*
 import reactor.core.publisher.Mono
@@ -18,15 +20,17 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
 
         return when (payload.operation) {
             "findUserByUsername" -> {
+                val schnauferByUsernameRequest = SchnauferByUsernameRequest.fromJson(payload.dataUtf8)
                 Mono.defer {
-                    repository.readByUsername(payload.dataUtf8)
+                    repository.readByUsername(schnauferByUsernameRequest.username)
                         .map { it.asPayload() }
                         .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
                 }
             }
             "findUserById" -> {
+                val schnauferByIdRequest = SchnauferByIdRequest.fromJson(payload.dataUtf8)
                 Mono.defer {
-                    repository.read(id = UUID.fromString(payload.dataUtf8))
+                    repository.read(id = schnauferByIdRequest.id)
                         .map { it.asPayload() }
                         .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
                 }
