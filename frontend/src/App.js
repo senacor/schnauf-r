@@ -8,7 +8,7 @@ import NotificationProvider from './NotificationProvider'
 import SchnaufFormContainer from './schnaufForm/SchnaufFormContainer'
 import RSocketClientProvider from './rsocket/RSocketClientProvider'
 
-const PATHS = {
+const PATH = {
   LOGIN: '/login',
   FEED: '/feed',
   SCHNAUF: '/feed/schnauf',
@@ -28,7 +28,7 @@ class App extends Component {
       userId
     }))
 
-    history.push(PATHS.FEED)
+    history.push(PATH.FEED)
   }
 
   navigateTo = ({history}, target) => {
@@ -51,20 +51,20 @@ class App extends Component {
             {notification}
             <Container>
               <RSocketClientProvider wsSocketUrl={WS_SOCKET_URL}>
-                <Route path={PATHS.LOGIN} render={(props) =>
+                <Route path={PATH.LOGIN} render={(props) =>
                   <LoginContainer
                     onLoginSuccess={(username) => this.onLoginSuccess(username, props)}
                   />
                 }/>
-                <Route exact path={PATHS.FEED} render={() => (<SchnaufFeedContainer/>)}/>
-                <Route exact path={PATHS.SCHNAUF} render={(props) =>
+                <Route exact path={PATH.FEED} render={() => (<SchnaufFeedContainer/>)}/>
+                <Route exact path={PATH.SCHNAUF} render={(props) =>
                   <SchnaufFormContainer
                     userId={this.state.userId}
                     onSchnaufSuccess={this.navigateTo(props, '/feed')}
                     onSchnaufError={this.logout}
                   />
                 } />
-                {!this.state.isLoggedIn && <Redirect to={PATHS.LOGIN}/>}
+                {!this.state.isLoggedIn && <Redirect to={PATH.LOGIN}/>}
               </RSocketClientProvider>
             </Container>
           </Router>

@@ -11,6 +11,7 @@ class SchnaufFormContainer extends Component {
        await rSocketClient.requestResponse({data: {submitter: userId, title}, metadata: {operation: 'createSchnauf'}})
        onSchnaufSuccess()
      } catch (error) {
+       console.error(error)
        onSchnaufError()
      }
    }

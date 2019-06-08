@@ -10,11 +10,13 @@ const SchnaufForm = ({onSubmit}) => {
     onSubmit(schnaufText)
   }
 
+  const changeSchaufText = (event) => setSchnaufText(event.target.value)
+
   return (
     <Form onSubmit={submit}>
       <Form.Group controlId="formLogin">
         <Form.Label>Schnauf-Text</Form.Label>
-        <Form.Control type="text" placeholder="Dein Schnauf" onChange={setSchnaufText} value={schnaufText}/>
+        <Form.Control type="text" placeholder="Dein Schnauf" onChange={changeSchaufText} value={schnaufText}/>
       </Form.Group>
       <Button variant="primary" type="submit"  disabled={!schnaufText}>
             Schnauf!
