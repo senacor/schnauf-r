@@ -1,10 +1,6 @@
 package com.senacor.schnaufr
 
-import com.senacor.schnaufr.gateway.SchnaufClient
-import com.senacor.schnaufr.gateway.SchnaufMessageHandler
-import com.senacor.schnaufr.gateway.SchnaufQueryServer
-import com.senacor.schnaufr.gateway.SchnauferClient
-import com.senacor.schnaufr.schnauf.query.*
+import com.senacor.schnaufr.gateway.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
@@ -16,21 +12,24 @@ object Bootstrap {
     fun main(args: Array<String>) {
         val executor = Executors.newSingleThreadExecutor()
 
-        val schnaufClient = SchnaufClient()
-        val schnauferClient = SchnauferClient()
+        val schnaufCommandClient = SchnaufCommandClient()
+        val schnaufUserClient = SchnaufUserClient()
+        val schnaufQueryClient = SchnaufQueryClient()
 
-        val server = SchnaufQueryServer(
-                messageHandler = SchnaufMessageHandler(
-                        schnaufClient,
-                        schnauferClient
+        val server = SchnaufGatewayServer(
+                gatewayMessageHandler = SchnaufGatewayMessageHandler(
+                        schnaufCommandClient,
+                        schnaufUserClient,
+                        schnaufQueryClient
                 ),
                 port = System.getenv("APPLICATION_PORT")?.toInt() ?: 8080
         )
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
-                schnaufClient.stop()
-                schnauferClient.stop()
+                schnaufCommandClient.stop()
+                schnaufUserClient.stop()
+                schnaufQueryClient.stop()
                 executor.shutdownNow()
                 logger.info("Application stopped")
             }
@@ -40,8 +39,9 @@ object Bootstrap {
             logger.info("Starting application")
 
             logger.info("Connecting to Clients")
-            schnaufClient.start()
-            schnauferClient.start()
+            schnaufCommandClient.start()
+            schnaufUserClient.start()
+            schnaufQueryClient.start()
 
             server.start()
             logger.info("Application started")

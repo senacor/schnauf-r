@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: schnauf-query
+  name: schnaufr-query
 spec:
   selector:
-    app: schnauf-query
-  type: LoadBalancer
+    app: schnaufr-query
+  type: ClusterIP
   ports:
     - name: tcp-app
       port: 8080
       targetPort: 8080
+  loadBalancerIP: 35.246.79.96 # gcloud compute addresses create schnaufr --region europe-west2
