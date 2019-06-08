@@ -7,10 +7,10 @@ import io.rsocket.util.DefaultPayload
 import java.util.*
 
 @JsonClass(generateAdapter = true)
-data class SchnaufrPosition(val id: UUID, val geolocation: Geolocation) {
+data class SchnaufrLocation(val id: UUID, val currentLocation: Geolocation) {
 
     companion object {
-        fun fromJson(value: String): SchnaufrPosition = JsonSerializer.fromJson(value)
+        fun fromJson(value: String): SchnaufrLocation = JsonSerializer.fromJson(value)
     }
 
     fun toJson(): String = JsonSerializer.toJsonString(this)

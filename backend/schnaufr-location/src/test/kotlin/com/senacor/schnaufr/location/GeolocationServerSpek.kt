@@ -2,30 +2,36 @@ package com.senacor.schnaufr.location
 
 import com.senacor.schnaufr.mongoDB
 import io.rsocket.Payload
+import io.rsocket.RSocket
 import io.rsocket.RSocketFactory
 import io.rsocket.transport.netty.client.TcpClientTransport
 import org.reactivestreams.Publisher
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import reactor.core.publisher.Flux
-import strikt.api.expectThat
-import strikt.assertions.isEqualTo
+import reactor.test.test
 import java.time.Instant
 import java.util.*
 
 
 class GeolocationServerSpek : Spek({
 
-    describe("Schaufr Geolocation server") {
+    describe("schaufr location API") {
 
         val mongoConnection by mongoDB(port = 27067)
         val geolocationRepository by memoized { GeolocationRepository(mongoConnection) }
 
         val sut = GeolocationServer(geolocationRepository)
 
+        lateinit var rSocket: RSocket
 
         before {
             sut.start()
+            rSocket = RSocketFactory
+                    .connect()
+                    .transport(TcpClientTransport.create(8097))
+                    .start()
+                    .block()!!
         }
         after {
             sut.stop()
@@ -35,26 +41,32 @@ class GeolocationServerSpek : Spek({
             geolocationRepository.deleteAll()
         }
 
-        it("can respond on channel") {
+        describe("receiving location updates") {
 
-            val rSocket = RSocketFactory
-                    .connect()
-                    .transport(TcpClientTransport.create(8097))
-                    .start()
-                    .block()!!
+            it("does broadcast the update to clients") {
 
-            val requestStream: Publisher<Payload> =
-                    Flux.just(SchnaufrPosition(
-                            UUID.randomUUID(),
-                            Geolocation(10.0, 10.0, Instant.now())).asPayload())
+                val requestStream: Publisher<Payload> = Flux.range(0, 1)
+                        .map {
+                            SchnaufrLocation(
+                                    UUID.randomUUID(),
+                                    Geolocation(23.0, 42.0, Instant.now())
+                            ).asPayload()
+                        }
 
-            val firstResponse = rSocket.requestChannel(requestStream)
-                    .doOnNext { println("Received Schnaufr Position $it") }
-                    .map { SchnaufrPosition.fromJson(it.dataUtf8) }
-                    .blockFirst()!!
+                rSocket.requestChannel(requestStream)
+                        .doOnNext { println("Client received Schnaufr Position $it") }
+                        .map { SchnaufrLocation.fromJson(it.dataUtf8) }
+                        .take(0)
+                        .test()
+                        .thenAwait()
+                        .expectNextMatches { schnaufr ->
+                            schnaufr.currentLocation.latitude.equals(23.0)
+                                    && schnaufr.currentLocation.longitude.equals(42.0)
+                        }
+                        .expectComplete()
+                        .verify()
 
-            expectThat(firstResponse.geolocation.latitude).isEqualTo(23.0)
-            expectThat(firstResponse.geolocation.longitude).isEqualTo(42.0)
+            }
         }
     }
 })

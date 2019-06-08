@@ -8,7 +8,6 @@ import org.bson.BsonDocument
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.reactivestreams.Publisher
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.EmitterProcessor
 import reactor.core.publisher.Flux
@@ -18,30 +17,29 @@ import java.util.*
 
 class GeolocationRepository(client: MongoClient) {
 
-    companion object {
-        val logger: Logger = LoggerFactory.getLogger("JsonSerializer")
-    }
+    private val logger = LoggerFactory.getLogger(GeolocationRepository::class.java)
 
     private val database = client.getDatabase("schnaufr-location")
-    private val collection = database.getCollection<SchnaufrPosition>()
+    private val collection = database.getCollection<SchnaufrLocation>()
 
-    fun upsert(schnaufr: SchnaufrPosition): Mono<Boolean> {
-        return collection.updateOne(schnaufr, UpdateOptions().upsert(true))
+    fun upsert(schnaufr: SchnaufrLocation): Mono<UpdateResult> {
+        logger.debug("Saving schnaufr location $schnaufr")
+        return collection
+                .updateOneById(schnaufr.id, schnaufr, UpdateOptions().upsert(true))
                 .toMono()
-                .map(UpdateResult::wasAcknowledged)
     }
 
-    fun readById(id: UUID): Mono<SchnaufrPosition> {
-        return collection.findOne(SchnaufrPosition::id eq id).toMono()
+    fun readById(id: UUID): Mono<SchnaufrLocation> {
+        return collection.findOne(SchnaufrLocation::id eq id).toMono()
     }
 
-    fun watch(principal: UUID? = null): Flux<SchnaufrPosition> {
+    fun watch(): Flux<SchnaufrLocation> {
 
-        val emitter = EmitterProcessor.create<SchnaufrPosition>()
+        val emitter = EmitterProcessor.create<SchnaufrLocation>()
 
         collection.withKMongo().watchIndefinitely(
-                subscribeListener = { logger.info("Subscribed to new Schnaufr locations") },
-                errorListener = { logger.error("Error on Schnaufr location subscription", it) },
+                subscribeListener = { logger.info("Subscribed to new schnaufr locations") },
+                errorListener = { logger.error("Error on schnaufr locations subscription", it) },
                 listener = { document ->
                     document.fullDocument?.let {
                         logger.info("Found new document on watch: $it")
