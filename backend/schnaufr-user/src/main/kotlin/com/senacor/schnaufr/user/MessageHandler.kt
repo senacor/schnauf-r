@@ -55,7 +55,7 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
         return when (payload.operation) {
 
             "findAvatar" -> {
-                val schnauferId = AvatarBySchnauferIdRequest.fromJson(payload.dataUtf8).id
+                val schnauferId = AvatarByIdRequest.fromJson(payload.dataUtf8).id
                 Flux.defer {
                     repository.readAvatar(schnauferId)
                         .map { DefaultPayload.create(it) }

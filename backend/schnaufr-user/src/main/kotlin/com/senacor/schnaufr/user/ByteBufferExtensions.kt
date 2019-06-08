@@ -2,7 +2,7 @@ package com.senacor.schnaufr.user
 
 import java.nio.ByteBuffer
 
-fun ByteBuffer.convertToByteArray(chunkSize: Int): ByteArray {// Create a byte array
+fun ByteBuffer.convertToByteArray(): ByteArray {// Create a byte array
     // Retrieve bytes between the position and limit
     // (see Putting Bytes into a ByteBuffer)
     val bytes = ByteArray(remaining())

@@ -49,16 +49,16 @@ class  SchnauferRepository(private val client: MongoClient) {
         return collection.find().toFlux()
     }
 
-    fun saveAvatar(schnauferId: UUID, data: InputStream): Mono<ObjectId> {
+    fun saveAvatar(avatarId: UUID, data: InputStream): Mono<ObjectId> {
 
         val options = GridFSUploadOptions()
             .chunkSizeBytes(1024 * 1024)
-            .metadata(Document("schnauferId", schnauferId))
+            .metadata(Document("avatarId", avatarId))
 
         val streamToUpload = toAsyncInputStream(data)
         return bucket.uploadFromStream("avatar", streamToUpload, options).toMono()
-            .doOnSuccess { logger.info("successfully uploaded avatar with id {}", schnauferId) }
-            .doOnError { logger.error("failed to upload avatar with id {}", schnauferId, it) }
+            .doOnSuccess { logger.info("successfully uploaded avatar with id {}", avatarId) }
+            .doOnError { logger.error("failed to upload avatar with id {}", avatarId, it) }
             .doFinally { streamToUpload.close() }
     }
 
@@ -83,7 +83,7 @@ class  SchnauferRepository(private val client: MongoClient) {
                             .doOnSuccess { logger.debug("emit buffer") }
                     }, 1)
                     .takeUntil { buffer -> buffer.second == -1 }
-                    .map { buffer -> buffer.first.convertToByteArray(chunkSize) }.doOnNext { logger.info("buffer converted to array with size ${it.size}") }
+                    .map { buffer -> buffer.first.convertToByteArray() }.doOnNext { logger.info("buffer converted to array with size ${it.size}") }
                     .doOnComplete {
                         logger.debug("avatar stream completed")
                     }

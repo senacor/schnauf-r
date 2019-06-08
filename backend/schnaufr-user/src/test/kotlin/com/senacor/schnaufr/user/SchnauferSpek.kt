@@ -106,17 +106,17 @@ class SchnauferSpek : Spek({
             }
         }
 
-        context("when an avatar is requested by schauferId") {
+        context("when an avatar is requested by id") {
 
             it("returns an avatar") {
                 val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
-                val schnauferId = UUID()
-                repository.saveAvatar(schnauferId = schnauferId, data = file).block()
+                val avatarId = UUID()
+                repository.saveAvatar(avatarId = avatarId, data = file).block()
 
 
-                val requestPayload = DefaultPayload.create(AvatarBySchnauferIdRequest(schnauferId).toJson(), """{"operation": "findAvatar"}""")
+                val requestPayload = DefaultPayload.create(AvatarByIdRequest(avatarId).toJson(), """{"operation": "findAvatar"}""")
                 val response = rSocket.requestStream(requestPayload)
-                    .map { it.data.convertToByteArray(512000) }
+                    .map { it.data.convertToByteArray() }
                     .reduce(ByteArray(0)) { arr1, arr2 -> arr1.plus(arr2) }
                     .block()!!
 

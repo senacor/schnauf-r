@@ -31,7 +31,7 @@ class SchnauferRepositorySpek : Spek({
         it("can read avatars") {
             val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
             val schnauferId = UUID()
-            sut.saveAvatar(schnauferId = schnauferId, data = file).block()
+            sut.saveAvatar(avatarId = schnauferId, data = file).block()
 
             val result = sut.readAvatar(schnauferId)
                 .doOnNext { println("dshahfashdfsj" + it.size) }
