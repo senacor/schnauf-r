@@ -1,15 +1,16 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
-import com.senacor.schnaufr.gateway.model.MetaData
-import com.senacor.schnaufr.gateway.model.Schnauf
-import com.senacor.schnaufr.schnauf.query.model.*
+import com.senacor.schnaufr.query.SchnaufClient
+import com.senacor.schnaufr.query.model.MetaData
+import com.senacor.schnaufr.query.model.Schnauf
 import io.rsocket.*
 import io.rsocket.transport.netty.server.TcpServerTransport
 import io.rsocket.util.DefaultPayload
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import reactor.core.publisher.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import strikt.api.expectThat
 import strikt.assertions.isTrue
 

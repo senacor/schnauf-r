@@ -1,8 +1,10 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
-import com.senacor.schnaufr.gateway.model.MetaData
-import com.senacor.schnaufr.gateway.model.Schnaufr
+import com.senacor.schnaufr.query.SchnauferClient
+import com.senacor.schnaufr.query.model.MetaData
+import com.senacor.schnaufr.query.model.SchnauferByIdRequest
+import com.senacor.schnaufr.query.model.Schnaufr
 import io.rsocket.*
 import io.rsocket.transport.netty.server.TcpServerTransport
 import io.rsocket.util.DefaultPayload
@@ -16,7 +18,7 @@ class SchnaufrClientSpek : Spek({
     val USERID = UUID();
     val USERNAME = "foo"
     val DISPLAYNAME = "bar"
-    val FINDUSER_OPERATION = "findUser"
+    val FINDUSER_OPERATION = "findUserById"
 
     class SchnaufrTestService {
         private lateinit var disposable: Closeable
@@ -40,8 +42,8 @@ class SchnaufrClientSpek : Spek({
                 override fun requestResponse(payload: Payload): Mono<Payload> {
                     val operation = MetaData.fromJson(payload.metadataUtf8)?.operation;
 
-                    if (FINDUSER_OPERATION.equals(operation) && payload.dataUtf8.equals(USERID.toString())) {
-                        return return Mono.just(DefaultPayload.create(testSchnauf.toJson()))
+                    if (FINDUSER_OPERATION.equals(operation) && SchnauferByIdRequest.fromJson(payload.dataUtf8).id == USERID) {
+                        return Mono.just(DefaultPayload.create(testSchnauf.toJson()))
                     }
                     return Mono.never()
                 }

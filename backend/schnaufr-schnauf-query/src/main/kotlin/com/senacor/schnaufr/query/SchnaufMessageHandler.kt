@@ -1,10 +1,10 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.operation
-import com.senacor.schnaufr.gateway.model.Author
-import com.senacor.schnaufr.gateway.model.Schnauf
-import com.senacor.schnaufr.gateway.model.SchnaufFeedEntry
+import com.senacor.schnaufr.query.model.Author
+import com.senacor.schnaufr.query.model.Schnauf
+import com.senacor.schnaufr.query.model.SchnaufFeedEntry
 import io.rsocket.AbstractRSocket
 import io.rsocket.Payload
 import org.slf4j.Logger

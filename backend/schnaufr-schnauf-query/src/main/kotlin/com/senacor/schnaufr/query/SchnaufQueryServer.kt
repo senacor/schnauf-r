@@ -1,4 +1,4 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import io.rsocket.*
 import io.rsocket.transport.netty.server.*
