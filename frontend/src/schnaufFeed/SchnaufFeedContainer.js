@@ -39,8 +39,10 @@ class SchnaufFeedContainer extends Component {
 
   componentDidMount() {
     const {rSocketClient} = this.props;
+      const requestSize = 1
+      const requestData = {data: {}}
 
-    this.unsubscribe = rSocketClient.subscribeRequestStream({data: {}}, 1,{
+      this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{
       onNext: this.onNext,
       onError: this.onError,
       onLimitReached: this.onLimitReached,
