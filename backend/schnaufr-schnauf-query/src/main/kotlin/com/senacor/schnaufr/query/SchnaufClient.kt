@@ -13,6 +13,8 @@ import reactor.core.publisher.*
 class SchnaufClient {
     companion object {
         const val GET_ALL_SCHNAUFS_COMMAND = "getAllSchnaufs"
+        const val WATCH_SCHNAUFS_COMMAND = "watchSchnaufs"
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
         val logger: Logger = LoggerFactory.getLogger(SchnaufQueryServer::class.java)
     }
 
@@ -23,6 +25,20 @@ class SchnaufClient {
     fun getAllSchnaufs(): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
             rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_COMMAND).toJson()))
+                    .map { Schnauf.fromJson(it.dataUtf8) }
+        }
+    }
+
+    fun watchAllSchnaufs(): Flux<Schnauf> {
+        return rsocket.flatMapMany { rsocket ->
+            rsocket.requestStream(DefaultPayload.create("", MetaData(WATCH_SCHNAUFS_COMMAND).toJson()))
+                    .map { Schnauf.fromJson(it.dataUtf8) }
+        }
+    }
+
+    fun getAllSchnaufsAndWatch(): Flux<Schnauf> {
+        return rsocket.flatMapMany { rsocket ->
+            rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_AND_WATCH).toJson()))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }

@@ -17,12 +17,23 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnauferClien
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
         const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
+        const val WATCH_SCHNAUFS = "watchSchnaufs"
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
+
     }
     override fun requestStream(payload: Payload): Flux<Payload> {
         return when (payload.operation) {
             GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs()
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload() }
+
+            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs()
+                    .flatMap { enrichWithSchnaufrInformation(it) }
+                    .map { it.asPayload()}
+
+            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch()
+                    .flatMap { enrichWithSchnaufrInformation(it) }
+                    .map { it.asPayload()}
 
             else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
