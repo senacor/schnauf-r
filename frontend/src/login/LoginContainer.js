@@ -13,7 +13,7 @@ class LoginContainer extends Component {
   login = async (username) => {
     const {rSocketClient} = this.props
     const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
-    this.props.onLoginSuccess(result.data.id)
+    this.props.onLoginSuccess(result.data)
   }
 
   render() {
