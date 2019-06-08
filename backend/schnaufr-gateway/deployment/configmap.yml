@@ -1,0 +1,15 @@
+#jinja2: variable_start_string:'${', variable_end_string:'}', trim_blocks: True
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schnaufr-gateway-config
+  namespace: schnaufr-gateway
+data:
+  APPLICATION_PORT: "8080"
+  SCHNAUF_COMMAND_HOST: "schnaufr-schnauf.schnaufr-schnauf"
+  SCHNAUF_COMMAND_PORT: "8080"
+  SCHNAUF_USER_HOST: "schnaufr-user.schnaufr-user"
+  SCHNAUF_USER_PORT: "8080"
+  SCHNAUF_QUERY_HOST: "schnaufr-query.schnaufr-query"
+  SCHNAUF_QUERY_PORT: "8080"
+

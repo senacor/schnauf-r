@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schnaufr-gateway
+  namespace: schnaufr-gateway
+  labels:
+    app: schnaufr-gateway
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: schnaufr-gateway
+  template:
+    metadata:
+      labels:
+        app: schnaufr-gateway
+    spec:
+      imagePullSecrets:
+        - name: artifactory
+      containers:
+        - name: schnaufr-gateway
+          imagePullPolicy: Always
+          image: gcr.io/main-stack-241307/schnaufr-gateway
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+          envFrom:
+            - configMapRef:
+                name: schnaufr-gateway-config
+          ports:
+            - name: tcp-app
+              containerPort: 8080
+          terminationMessagePath: /dev/stdout

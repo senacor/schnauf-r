@@ -7,19 +7,22 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
 object Bootstrap {
-
     val logger = LoggerFactory.getLogger(Bootstrap::class.java)
 
     @JvmStatic
     fun main(args: Array<String>) {
         val executor = Executors.newSingleThreadExecutor()
 
+        val mongoHost = System.getenv("MONGO_HOST") ?: "mongo"
+        val mongoPort = System.getenv("MONGO_PORT")?.toInt() ?: 27017
+        val mongoConnectionString = "mongodb://$mongoHost:$mongoPort"
+
+        val schnauferRepository = SchnauferRepository(
+                KMongo.createClient(ConnectionString(mongoConnectionString))
+        )
+
         val server = SchnauferServer(
-            MessageHandler(
-                SchnauferRepository(
-                    KMongo.createClient(ConnectionString("mongodb://localhost:27017"))
-                )
-            )
+            MessageHandler(schnauferRepository)
         )
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
@@ -31,9 +34,14 @@ object Bootstrap {
         })
 
         executor.execute {
-            logger.info("Starting application")
+            logger.info("Starting application, connecting to MongoDB at $mongoConnectionString")
             server.start()
             logger.info("Application started")
+            logger.info("Creating initial users")
+            DefaultSchnaufer.allSchnaufer.map {
+                schnauferRepository.create(it).block()
+            }
+            logger.info("Created initial users")
             Thread.currentThread().join()
         }
     }

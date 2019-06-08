@@ -1,0 +1,93 @@
+version: "3.1"
+
+services:
+  mongo0:
+    image: mongo:3.6-xenial
+    restart: always
+    ports:
+      - 27017:27017
+    command: mongod --bind_ip_all --replSet rs0
+
+  mongo1:
+    image: mongo:3.6-xenial
+    restart: always
+    ports:
+      - 27018:27017
+    command: mongod --bind_ip_all --replSet rs0
+
+  mongo2:
+    image: mongo:3.6-xenial
+    restart: always
+    ports:
+      - 27019:27017
+    command: mongod --bind_ip_all --replSet rs0
+
+  mongosetup:
+    image: mongo:3.6-xenial
+    depends_on:
+      - mongo0
+      - mongo1
+      - mongo2
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: [ "/scripts/mongo_setup.sh" ]
+
+  schnaufr-schnauf:
+    image: gcr.io/main-stack-241307/schnaufr-schnauf:latest
+    depends_on:
+      - mongosetup
+    ports:
+      - 8080:8080
+    environment:
+      - MONGO_HOST=mongo0
+      - MONGO_PORT=27017
+
+  mongo-user:
+    image: mongo:3.6-xenial
+    restart: always
+    ports:
+      - "27020:27020"
+    command: mongod --bind_ip_all --port 27020
+
+
+  schnauf-user:
+    image: gcr.io/main-stack-241307/schnauf-user:latest
+    depends_on:
+      - mongo-user
+    ports:
+      - 9090:9090
+    environment:
+      - APPLICATION_PORT=9090
+      - MONGO_HOST=mongo-user
+      - MONGO_PORT=27020
+
+  schnauf-query:
+    image: gcr.io/main-stack-241307/schnauf-query:latest
+    depends_on:
+      - schnaufr-schnauf
+      - schnauf-user
+    ports:
+      - 8090:8090
+    environment:
+      - APPLICATION_PORT=8090
+      - SCHNAUF_COMMAND_HOST=schnaufr-schnauf
+      - SCHNAUF_COMMAND_PORT=8080
+      - SCHNAUFR_HOST=schnauf-user
+      - SCHNAUFR_PORT=9090
+
+  schnauf-gateway:
+    image: gcr.io/main-stack-241307/schnauf-gateway:latest
+    depends_on:
+      - schnaufr-schnauf
+      - schnauf-user
+      - schnauf-query
+    ports:
+      - 8085:8085
+    environment:
+      - APPLICATION_PORT=8085
+      - SCHNAUF_COMMAND_HOST=schnaufr-schnauf
+      - SCHNAUF_COMMAND_PORT=8080
+      - SCHNAUF_USER_HOST=schnauf-user
+      - SCHNAUF_USER_PORT=9090
+      - SCHNAUF_QUERY_HOST=schnauf-query
+      - SCHNAUF_QUERY_PORT=8090

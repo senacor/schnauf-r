@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schnaufr-user
+  namespace: schnaufr-user
+  labels:
+    app: schnaufr-user
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: schnaufr-user
+  template:
+    metadata:
+      labels:
+        app: schnaufr-user
+    spec:
+      imagePullSecrets:
+        - name: artifactory
+      containers:
+        - name: schnaufr-user
+          image: gcr.io/main-stack-241307/schnaufr-user
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+          ports:
+            - name: tcp-app
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: schnaufr-user-config
+          terminationMessagePath: /dev/stdout
+        - name: mongo
+          image: mongo:3.6-xenial
+          ports:
+            - containerPort: 27017
