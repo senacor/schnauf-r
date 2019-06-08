@@ -56,10 +56,10 @@ class SchnaufRepository(private val client: MongoClient) {
 
     fun readLatest(principal: UUID? = null, limit: Int): Flux<Schnauf> {
         return Flux.defer {
-            (collection
+            collection
                     .find(recipientFilterBson(principal, Schnauf::recipients))
                     .sort(Sorts.descending("timestamp"))
-                    .limit(limit))
+                    .limit(limit)
         }
     }
 

@@ -97,7 +97,7 @@ class SchnaufSpek : Spek({
                 }.message.isEqualTo("unrecognized operation someWrongOperationName")
             }
 
-            it("should retrieve all former schnaufs once") {
+            it("should retrieve all former schnaufs once in descending order") {
                 // create a few schnaufs
                 val title1 = "first-schnauf"
                 val submitter1 = UUID()

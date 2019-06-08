@@ -1,12 +1,16 @@
 package com.senacor.schnaufr.schnauf
 
-import com.senacor.schnaufr.*
+import com.senacor.schnaufr.limit
 import com.senacor.schnaufr.model.CreateSchnaufRequest
 import com.senacor.schnaufr.model.Schnauf
-import io.rsocket.*
+import com.senacor.schnaufr.operation
+import com.senacor.schnaufr.principal
+import io.rsocket.AbstractRSocket
+import io.rsocket.Payload
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 class MessageHandler(private val schnaufRepository: SchnaufRepository) : AbstractRSocket() {
 
@@ -40,19 +44,17 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
         return when (payload.operation) {
             GET_ALL_SCHNAUFS ->
                 schnaufRepository
-                        .readLatest(principal = principal, limit = limit)
+                        .readLatest(principal, limit)
                         .map { it.asPayload() }
-
 
             WATCH_SCHNAUFS ->
                 schnaufRepository
                         .watch(principal)
                         .map { it.asPayload() }
 
-
             GET_ALL_SCHNAUFS_AND_WATCH ->
                 schnaufRepository
-                        .readLatest(principal = principal, limit = limit)
+                        .readLatest(principal, limit)
                         .concatWith(
                                 schnaufRepository
                                         .watch(principal)
