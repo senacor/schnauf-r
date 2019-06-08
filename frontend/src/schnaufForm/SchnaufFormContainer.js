@@ -1,17 +1,17 @@
-import React, {Component} from 'react';
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import SchnaufForm from './SchnaufForm';
+import SchnaufForm from './SchnaufForm'
 import {withRSocketClient} from '../rsocket/RSocketClientProvider'
 
 class SchnaufFormContainer extends Component {
 
    submitSchnauf = async (title) => {
-     const {onSchnaufSuccess, onSchnaufError, userId, rSocketClient} = this.props;
+     const {onSchnaufSuccess, onSchnaufError, userId, rSocketClient} = this.props
      try {
        await rSocketClient.requestResponse({data: {submitter: userId, title}, metadata: {operation: 'createSchnauf'}})
-       onSchnaufSuccess();
+       onSchnaufSuccess()
      } catch (error) {
-       onSchnaufError();
+       onSchnaufError()
      }
    }
 
@@ -29,4 +29,4 @@ SchnaufFormContainer.propTypes = {
   rSocketClient: PropTypes.object.isRequired, // injected by withRSocketClient
 }
 
-export default withRSocketClient(SchnaufFormContainer);
+export default withRSocketClient(SchnaufFormContainer)

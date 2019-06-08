@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import { Form, Button } from 'react-bootstrap'
 
@@ -18,8 +18,8 @@ export default class Login extends Component {
   }
 
   submit = (event) => {
-    event.preventDefault();
-    this.props.onLogin(this.state.username);
+    event.preventDefault()
+    this.props.onLogin(this.state.username)
   }
 
   render() {
@@ -39,4 +39,4 @@ export default class Login extends Component {
 
 Login.propTypes = {
   onLogin: PropTypes.func.isRequired
-};
+}

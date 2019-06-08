@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
-import {Spinner, Row} from 'react-bootstrap';
-import SchnaufFeed from './SchnaufFeed';
-import {withNotification} from '../NotificationProvider';
+import React, {Component} from 'react'
+import {Spinner, Row} from 'react-bootstrap'
+import SchnaufFeed from './SchnaufFeed'
+import {withNotification} from '../NotificationProvider'
 import {withRSocketClient} from '../rsocket/RSocketClientProvider'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 class SchnaufFeedContainer extends Component {
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       schnaufs :[],
       loading: true,
 
     }
-    this.unsubscribe = () => {};
+    this.unsubscribe = () => {}
   }
 
   onNext = (schnauf) => {
@@ -22,36 +22,36 @@ class SchnaufFeedContainer extends Component {
       ...prevState,
       loading: false,
       schnaufs: [schnauf, ...prevState.schnaufs ]
-    }));
+    }))
   }
 
   onError = () => {
     this.setState((prevState) => ({
       ...prevState,
       loading: false
-    }));
-    this.props.addNotification('Fehler beim Laden');
+    }))
+    this.props.addNotification('Fehler beim Laden')
   }
 
   onLimitReached = (requestNext) => {
-    setTimeout(requestNext, 2000);
+    setTimeout(requestNext, 2000)
   }
 
   componentDidMount() {
-    const {rSocketClient} = this.props;
-      const requestSize = 1
-      const requestData = {data: {}}
+    const {rSocketClient} = this.props
+    const requestSize = 1
+    const requestData = {data: {}}
 
-      this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{
+    this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{
       onNext: this.onNext,
       onError: this.onError,
       onLimitReached: this.onLimitReached,
-    });
+    })
 
   }
 
   componentWillUnmount = () => {
-    this.unsubscribe();
+    this.unsubscribe()
   }
 
   render() {
@@ -60,7 +60,7 @@ class SchnaufFeedContainer extends Component {
         <Row className="justify-content-md-center">
           <Spinner animation="border" />
         </Row>
-      );
+      )
     }
     return (
       <SchnaufFeed schnaufs={this.state.schnaufs}/>
@@ -72,6 +72,6 @@ class SchnaufFeedContainer extends Component {
 SchnaufFeedContainer.propTypes = {
   addNotification: PropTypes.func.isRequired,  // injected by withNotification
   rSocketClient: PropTypes.object.isRequired, // injected by withRSocketClient
-};
+}
 
-export default withNotification(withRSocketClient(SchnaufFeedContainer));
+export default withNotification(withRSocketClient(SchnaufFeedContainer))

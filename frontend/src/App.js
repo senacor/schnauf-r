@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Redirect}  from 'react-router-dom';
-import {Container} from 'react-bootstrap';
-import LoginContainer from './login/LoginContainer';
-import SchnaufFeedContainer from './schnaufFeed/SchnaufFeedContainer';
-import Navigation from './navigation/Navigation';
-import NotificationProvider from './NotificationProvider';
-import SchnaufFormContainer from './schnaufForm/SchnaufFormContainer';
-import RSocketClientProvider from './rsocket/RSocketClientProvider';
+import React, {Component} from 'react'
+import {BrowserRouter as Router, Route, Redirect}  from 'react-router-dom'
+import {Container} from 'react-bootstrap'
+import LoginContainer from './login/LoginContainer'
+import SchnaufFeedContainer from './schnaufFeed/SchnaufFeedContainer'
+import Navigation from './navigation/Navigation'
+import NotificationProvider from './NotificationProvider'
+import SchnaufFormContainer from './schnaufForm/SchnaufFormContainer'
+import RSocketClientProvider from './rsocket/RSocketClientProvider'
 
 const PATHS = {
   LOGIN: '/login',
@@ -14,7 +14,7 @@ const PATHS = {
   SCHNAUF: '/feed/schnauf',
 }
 
-const WS_SOCKET_URL = 'ws://35.246.79.96:8080';
+const WS_SOCKET_URL = 'ws://35.246.79.96:8080'
 
 class App extends Component {
   state = {
@@ -26,9 +26,9 @@ class App extends Component {
       ... prevState,
       isLoggedIn: true,
       userId
-    }));
+    }))
 
-    history.push(PATHS.FEED);
+    history.push(PATHS.FEED)
   }
 
   navigateTo = ({history}, target) => {
@@ -74,4 +74,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default App

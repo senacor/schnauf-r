@@ -1,7 +1,7 @@
-import React from 'react';
-import {Navbar, Nav} from 'react-bootstrap';
+import React from 'react'
+import {Navbar, Nav} from 'react-bootstrap'
 import {NavLink} from 'react-router-dom'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 const Navigation = ({loggedIn}) =>
   <Navbar bg="dark" variant="dark" sticky="top">
@@ -16,6 +16,6 @@ const Navigation = ({loggedIn}) =>
 
 Navigation.propTypes = {
   loggedIn: PropTypes.bool
-};
+}
 
-export default Navigation;
+export default Navigation

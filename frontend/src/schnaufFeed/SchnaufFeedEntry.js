@@ -22,6 +22,6 @@ const SchnaufFeedEntry = ({schnauf}) =>
 
 SchnaufFeedEntry.propTypes = {
   schnauf: PropTypes.object.isRequired
-};
+}
 
-export default SchnaufFeedEntry;
+export default SchnaufFeedEntry

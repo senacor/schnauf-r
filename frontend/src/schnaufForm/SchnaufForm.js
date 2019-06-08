@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
-import {Button, Form} from 'react-bootstrap';
+import React, {useState} from 'react'
+import {Button, Form} from 'react-bootstrap'
 import PropTypes from 'prop-types'
 
 const SchnaufForm = ({onSubmit}) => {
-  const [schnaufText, setSchnaufText] = useState('');
+  const [schnaufText, setSchnaufText] = useState('')
 
   const submit = (event) => {
-    event.preventDefault();
-    onSubmit(schnaufText);
+    event.preventDefault()
+    onSubmit(schnaufText)
   }
 
   return (
@@ -20,12 +20,12 @@ const SchnaufForm = ({onSubmit}) => {
             Schnauf!
       </Button>
     </Form>
-  );
+  )
 
 }
 
 SchnaufForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-};
+}
 
-export default SchnaufForm;
+export default SchnaufForm
