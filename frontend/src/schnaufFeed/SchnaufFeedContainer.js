@@ -12,7 +12,6 @@ class SchnaufFeedContainer extends Component {
     this.state = {
       schnaufs :[],
       loading: true,
-      error: false,
 
     }
     this.unsubscribe = () => {};
@@ -22,14 +21,12 @@ class SchnaufFeedContainer extends Component {
     this.setState((prevState) => ({
       ...prevState,
       loading: false,
-      error: false,
       schnaufs: [schnauf, ...prevState.schnaufs ]
     }));
   }
 
   onError = (error) => {
     this.setState((prevState) => ({
-      error: true,
       loading: false
     }));
     this.props.addNotification('Fehler beim Laden');

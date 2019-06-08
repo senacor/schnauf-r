@@ -4,6 +4,11 @@ import PropTypes from 'prop-types'
 import SchnaufFeedEntry from './SchnaufFeedEntry';
 
 const SchnaufFeed = ({schnaufs}) => {
+
+  if (!schnaufs.length) {
+    return (<div>Keine Schnaufs</div>);
+  }
+
   const schnaufEntries = schnaufs.map((schnauf) =>
     <ListGroupItem key={schnauf.id}>
       <SchnaufFeedEntry schnauf={schnauf}/>
@@ -13,7 +18,7 @@ const SchnaufFeed = ({schnaufs}) => {
 }
 
 SchnaufFeed.propTypes = {
-  schnaufs: PropTypes.arrayOf(SchnaufFeedEntry).isRequired
+  schnaufs: PropTypes.array.isRequired
 };
 
 export default SchnaufFeed;
