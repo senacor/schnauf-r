@@ -23,23 +23,23 @@ class SchnaufClient {
     private val schnaufCommandPort = System.getenv("SCHNAUF_COMMAND_PORT")?.toInt() ?: 8081
     private val connectionString = "$schnaufCommandHost:$schnaufCommandPort"
 
-    fun getAllSchnaufs(limit: Int, principal: UUID): Flux<Schnauf> {
+    fun getAllSchnaufs(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_COMMAND, limit, principal).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }
 
-    fun watchAllSchnaufs(limit: Int, principal: UUID): Flux<Schnauf> {
+    fun watchAllSchnaufs(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(WATCH_SCHNAUFS_COMMAND, limit, principal).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }
 
-    fun getAllSchnaufsAndWatch(limit: Int, principal: UUID): Flux<Schnauf> {
+    fun getAllSchnaufsAndWatch(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_AND_WATCH, limit, principal).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }

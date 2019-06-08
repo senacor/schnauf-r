@@ -25,15 +25,15 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnauferClien
     }
     override fun requestStream(payload: Payload): Flux<Payload> {
         return when (payload.operation) {
-            GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs(payload.limit, payload.principal)
+            GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload() }
 
-            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs(payload.limit, payload.principal)
+            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload()}
 
-            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch(payload.limit, payload.principal)
+            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload()}
 
