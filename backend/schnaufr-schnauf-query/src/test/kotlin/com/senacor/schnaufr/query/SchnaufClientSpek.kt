@@ -70,7 +70,7 @@ class SchnaufClientSpek : Spek({
 
         it("can get all schnaufs") {
 
-            val schnaufs = sut.getAllSchnaufs(-1, java.util.UUID.randomUUID()).toIterable().iterator();
+            val schnaufs = sut.getAllSchnaufs(MetaData(GET_ALL_SCHNAUFS_COMMAND, -1, java.util.UUID.randomUUID()).toJson()).toIterable().iterator();
 
             expectThat(schnaufs.hasNext()).isTrue()
         }

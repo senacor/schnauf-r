@@ -26,7 +26,7 @@ class SchnaufMessageHandlerSpek : Spek({
 
     describe("schnauf message handler") {
         val mockedSchnaufClient = mockk<SchnaufClient>()
-        every { mockedSchnaufClient.getAllSchnaufs(any(), any()) } returns Flux.just(Schnauf(schnaufId, authorId, title))
+        every { mockedSchnaufClient.getAllSchnaufs(any()) } returns Flux.just(Schnauf(schnaufId, authorId, title))
         val mockedSchnaufrClient =  mockk<SchnauferClient>()
         every { mockedSchnaufrClient.getSchnaufrById(authorId) } returns Mono.just(Schnaufr(authorId, avatarId, username, displayName))
         val sut = SchnaufMessageHandler(mockedSchnaufClient, mockedSchnaufrClient)
