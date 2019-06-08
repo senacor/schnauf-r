@@ -5,11 +5,11 @@ import createRSocketClient from '../rsocket/rSocketClient';
 
 class SchnaufFormContainer extends Component {
 
-   submitSchnauf = async (schnaufText) => {
+   submitSchnauf = async (title) => {
      const {onSchnaufSuccess, onSchnaufError, userId} = this.props;
      try {
        const {requestResponse} = await createRSocketClient('ws://35.246.79.96:8080')
-       await requestResponse({data: {submitter: userId, title: schnaufText}, metadata: {operation: 'createSchnauf'}})
+       await requestResponse({data: {submitter: userId, title}, metadata: {operation: 'createSchnauf'}})
        onSchnaufSuccess();
      } catch (error) {
        onSchnaufError();

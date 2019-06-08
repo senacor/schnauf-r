@@ -1,6 +1,5 @@
 
 const requestResponse = (socket) => (requestData) => {
-  console.log(socket)
   const single = socket.requestResponse(requestData);
 
   return new Promise((resolve, reject) => {
