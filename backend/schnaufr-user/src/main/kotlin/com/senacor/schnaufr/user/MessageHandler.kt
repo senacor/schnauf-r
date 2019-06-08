@@ -24,7 +24,7 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
                 Mono.defer {
                     repository.readByUsername(schnauferByUsernameRequest.username)
                         .map { it.asPayload() }
-                        .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
+                        .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound, use: "+schnauferByUsernameRequest.username)))
                 }
             }
             "findUserById" -> {
@@ -32,7 +32,7 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
                 Mono.defer {
                     repository.read(id = schnauferByIdRequest.id)
                         .map { it.asPayload() }
-                        .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
+                        .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound, use: "+schnauferByIdRequest.id)))
                 }
             }
             else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
