@@ -5,8 +5,8 @@ metadata:
   name: schnauf-query-config
 data:
   APPLICATION_PORT: "8080"
-  SCHNAUF_COMMAND_HOST: "localhost"
+  SCHNAUF_COMMAND_HOST: "schnaufr-schnauf.schnaufr-schnauf"
   SCHNAUF_COMMAND_PORT: "8080"
-  SCHNAUFR_HOST: "localhost"
+  SCHNAUFR_HOST: "schnauf-user"
   SCHNAUFR_PORT: "8080"
 
