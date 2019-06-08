@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: schnauf-location
+spec:
+  selector:
+    app: schnauf-location
+  type: LoadBalancer
+  ports:
+    - name: tcp-app
+      port: 8080
+      targetPort: 8080
