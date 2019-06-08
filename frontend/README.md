@@ -25,3 +25,10 @@ Runs the test watcher in an interactive mode.<br>
 ### `yarn build`
 Builds the app for production to the `build/output` folder.<br>
 It correctly bundles React in production mode and optimizes the build.
+
+
+## Deploy
+To deploy you have to run `yarn` and `yarn build`. Afterwards you can run
+`docker build -t "gcr.io/main-stack-241307/schnaufr-frontend:latest" .` to build the image.
+Push it afterwards with `docker push gcr.io/main-stack-241307/schnaufr-frontend:latest`.
+To get the latest version simply delete the pod `schnaufr-gateway`.

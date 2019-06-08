@@ -4,9 +4,16 @@ import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.serialization.JsonSerializer
 import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
+import java.time.Instant
 import java.util.*
 
-data class Schnauf(val id: UUID, val title: String, val submitter: UUID, val recipients: List<UUID> = listOf()) {
+data class Schnauf(
+        val id: UUID,
+        val title: String,
+        val submitter: UUID,
+        val recipients: List<UUID> = listOf(),
+        val timestamp: Instant = Instant.now()
+) {
 
     companion object {
         fun fromRequest(request: CreateSchnaufRequest): Schnauf = Schnauf(UUID(), request.title, request.submitter, request.recipients)

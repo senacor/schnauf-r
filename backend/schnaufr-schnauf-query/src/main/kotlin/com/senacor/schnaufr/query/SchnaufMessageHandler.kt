@@ -1,7 +1,9 @@
 package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.limit
 import com.senacor.schnaufr.operation
+import com.senacor.schnaufr.principal
 import com.senacor.schnaufr.query.model.Author
 import com.senacor.schnaufr.query.model.Schnauf
 import com.senacor.schnaufr.query.model.SchnaufFeedEntry
@@ -23,15 +25,15 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnauferClien
     }
     override fun requestStream(payload: Payload): Flux<Payload> {
         return when (payload.operation) {
-            GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs()
+            GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload() }
 
-            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs()
+            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload()}
 
-            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch()
+            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch(payload.metadataUtf8)
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload()}
 

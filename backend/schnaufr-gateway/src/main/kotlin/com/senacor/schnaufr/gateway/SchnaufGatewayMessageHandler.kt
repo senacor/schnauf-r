@@ -27,6 +27,8 @@ class SchnaufGatewayMessageHandler(
         // Schnauf-User
         const val FIND_USER_BY_USERNAME = "findUserByUsername" // request-response
         const val FIND_USER_BY_ID = "findUserById" // request-response
+        const val FIND_ALL_USERS = "findAllUsers" // request-response
+        const val FIND_AVATAR = "findAvatar" // request-stream
     }
 
     override fun requestResponse(payload: Payload): Mono<Payload> {
@@ -35,6 +37,7 @@ class SchnaufGatewayMessageHandler(
             CREATE_SCHNAUF -> schnaufCommandClient.rsocket.flatMap { it.requestResponse(payload) }
             FIND_USER_BY_USERNAME -> schnaufUserClient.rsocket.flatMap { it.requestResponse(payload) }
             FIND_USER_BY_ID -> schnaufUserClient.rsocket.flatMap { it.requestResponse(payload) }
+            FIND_ALL_USERS -> schnaufUserClient.rsocket.flatMap { it.requestResponse(payload) }
             else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
     }
@@ -45,6 +48,7 @@ class SchnaufGatewayMessageHandler(
             WATCH_SCHNAUFS -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
             GET_ALL_SCHNAUFS_AND_WATCH -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
             GET_ALL_SCHNAUFS -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
+            FIND_AVATAR -> schnaufUserClient.rsocket.flatMapMany { it.requestStream(payload) }
             else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
     }

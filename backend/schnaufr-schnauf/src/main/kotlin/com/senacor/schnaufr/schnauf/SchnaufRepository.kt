@@ -2,6 +2,7 @@ package com.senacor.schnaufr.schnauf
 
 import com.mongodb.BasicDBObject
 import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import com.mongodb.client.result.DeleteResult
 import com.mongodb.reactivestreams.client.MongoClient
 import com.senacor.schnaufr.model.Schnauf
@@ -9,11 +10,17 @@ import org.bson.BsonDocument
 import org.bson.conversions.Bson
 import org.litote.kmongo.contains
 import org.litote.kmongo.eq
-import org.litote.kmongo.reactivestreams.*
+import org.litote.kmongo.reactivestreams.findOne
+import org.litote.kmongo.reactivestreams.getCollection
+import org.litote.kmongo.reactivestreams.watchIndefinitely
+import org.litote.kmongo.reactivestreams.withKMongo
 import org.litote.kmongo.size
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.*
+import reactor.core.publisher.EmitterProcessor
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import java.util.*
 import kotlin.reflect.KProperty1
 
@@ -47,8 +54,13 @@ class SchnaufRepository(private val client: MongoClient) {
         return collection.findOne(Schnauf::id eq id).toMono()
     }
 
-    fun readLatest(limit: Int = 10, principal: UUID? = null): Flux<Schnauf> {
-        return Flux.defer { (collection.find(recipientFilterBson(principal, Schnauf::recipients)).limit(limit)) }
+    fun readLatest(principal: UUID? = null, limit: Int): Flux<Schnauf> {
+        return Flux.defer {
+            collection
+                    .find(recipientFilterBson(principal, Schnauf::recipients))
+                    .sort(Sorts.descending("timestamp"))
+                    .limit(limit)
+        }
     }
 
     fun watch(principal: UUID? = null): Flux<Schnauf> {

@@ -11,6 +11,9 @@ val Payload.operation: String?
 val Payload.principal: UUID?
     get() = metadataMap["principal"]?.let { UUID.fromString(it) }
 
+val Payload.limit: Int?
+    get() = metadataMap["limit"]?.let { Integer.parseInt(it) }
+
 private val Payload.metadataMap: Map<String, String>
     get() {
         return {

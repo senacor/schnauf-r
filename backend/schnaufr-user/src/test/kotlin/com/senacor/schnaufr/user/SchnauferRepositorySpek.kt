@@ -3,14 +3,14 @@ package com.senacor.schnaufr.user
 import com.senacor.schnaufr.*
 import com.senacor.schnaufr.user.model.Schnaufer
 import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
+import org.spekframework.spek2.style.specification.*
 import reactor.core.publisher.toMono
 import strikt.api.expectThat
 import strikt.assertions.*
 
 class SchnauferRepositorySpek : Spek({
 
-    describe("schnaufer master data management") {
+    xdescribe("schnaufer master data management") {
         val client by mongoDB(port = 27017)
         val database by lazy { client.getDatabase("schnauf") }
 
@@ -29,15 +29,17 @@ class SchnauferRepositorySpek : Spek({
         }
 
         it("can read avatars") {
-
-            val stream = this::class.java.getResource("/avatars/avatar_moni.jpg").openStream()
+            val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
             val schnauferId = UUID()
-            sut.saveAvatar(schnauferId = schnauferId, data = stream).block()
+            sut.saveAvatar(avatarId = schnauferId, data = file).block()
 
-            val gridFSFile = sut.readAvatar(schnauferId).block()
+            val result = sut.readAvatar(schnauferId)
+                .doOnNext { println("dshahfashdfsj" + it.size) }
+                .reduce(ByteArray(0)) { arr1, arr2 -> arr1.plus(arr2) }
+                .block()!!
 
-            expectThat(gridFSFile?.filename).isEqualTo("avatar")
-            expectThat(gridFSFile?.metadata).isNotNull().hasEntry("schnauferId", schnauferId)
+            expectThat(result.size).isEqualTo(989664)
+
         }
 
     }

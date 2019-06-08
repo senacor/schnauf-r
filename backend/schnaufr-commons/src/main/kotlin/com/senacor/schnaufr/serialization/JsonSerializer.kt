@@ -1,6 +1,7 @@
 package com.senacor.schnaufr.serialization
 
-import com.squareup.moshi.*
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.slf4j.LoggerFactory
 
 public object JsonSerializer {
@@ -10,8 +11,9 @@ public object JsonSerializer {
 
     init {
         moshi = Moshi.Builder()
-            .add(UUIDAdapter)
-            .build()
+                .add(UUIDAdapter)
+                .add(InstantAdapter)
+                .build()
     }
 
     inline fun <reified T> fromJson(json: String): T {

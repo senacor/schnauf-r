@@ -8,7 +8,6 @@ import java.util.UUID
 
 @JsonClass(generateAdapter = true)
 data class SchnauferByIdRequest(val id: UUID) {
-
     companion object {
         fun fromJson(value: String): SchnauferByIdRequest = JsonSerializer.fromJson(value)
     }

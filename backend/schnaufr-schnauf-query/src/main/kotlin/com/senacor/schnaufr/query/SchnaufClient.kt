@@ -9,6 +9,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import reactor.core.Disposable
 import reactor.core.publisher.*
+import java.util.*
 
 class SchnaufClient {
     companion object {
@@ -22,23 +23,23 @@ class SchnaufClient {
     private val schnaufCommandPort = System.getenv("SCHNAUF_COMMAND_PORT")?.toInt() ?: 8081
     private val connectionString = "$schnaufCommandHost:$schnaufCommandPort"
 
-    fun getAllSchnaufs(): Flux<Schnauf> {
+    fun getAllSchnaufs(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_COMMAND).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }
 
-    fun watchAllSchnaufs(): Flux<Schnauf> {
+    fun watchAllSchnaufs(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(WATCH_SCHNAUFS_COMMAND).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }
 
-    fun getAllSchnaufsAndWatch(): Flux<Schnauf> {
+    fun getAllSchnaufsAndWatch(metadata: String): Flux<Schnauf> {
         return rsocket.flatMapMany { rsocket ->
-            rsocket.requestStream(DefaultPayload.create("", MetaData(GET_ALL_SCHNAUFS_AND_WATCH).toJson()))
+            rsocket.requestStream(DefaultPayload.create("", metadata))
                     .map { Schnauf.fromJson(it.dataUtf8) }
         }
     }
