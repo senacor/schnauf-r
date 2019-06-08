@@ -20,7 +20,7 @@ class GeolocationServer(val repository: GeolocationRepository) {
         closeable = RSocketFactory
                 .receive()
                 .acceptor(this::handler)
-                .transport(TcpServerTransport.create(8080))
+                .transport(TcpServerTransport.create(8097))
                 .start()
                 .doOnSuccess { logger.info("Server started") }
                 .block()
@@ -32,7 +32,6 @@ class GeolocationServer(val repository: GeolocationRepository) {
     }
 
     private fun handler(setup: ConnectionSetupPayload, sendingSocket: RSocket): Mono<RSocket> {
-        logger.info("Received setup {}", setup)
         return Mono.just(messageHandler)
     }
 
