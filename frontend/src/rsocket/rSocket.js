@@ -1,7 +1,7 @@
 import {JsonSerializers, RSocketClient} from 'rsocket-core';
 import RSocketWebSocketClient from 'rsocket-websocket-client';
 
-const createRSocket = ({url}) => {
+const createRSocket = (url) => {
   const rSocketClient = new RSocketClient({
     serializers: JsonSerializers,
     setup: {
