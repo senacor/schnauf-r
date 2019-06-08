@@ -42,8 +42,8 @@ object DefaultSchnaufer {
     private val navaroSchnaufer = Schnaufer(
             java.util.UUID.fromString("c70c98fe-479d-4646-9ef2-e137b28b867c"),
             java.util.UUID.fromString("2863314f-f3c7-4bfc-9c9f-f13be58741eb"),
-            "spainNavaro",
-            "Antonio Navaro"
+            "anton",
+            "Antonio Navarro"
     )
     private val pewSchnaufer = Schnaufer(
             java.util.UUID.fromString("40f0fb39-4574-421a-8f08-0c2179614fb6"),
