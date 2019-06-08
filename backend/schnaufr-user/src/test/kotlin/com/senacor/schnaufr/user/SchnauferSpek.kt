@@ -1,9 +1,7 @@
 package com.senacor.schnaufr.user
 
 import com.senacor.schnaufr.*
-import com.senacor.schnaufr.user.model.Schnaufer
-import com.senacor.schnaufr.user.model.SchnauferByIdRequest
-import com.senacor.schnaufr.user.model.SchnauferByUsernameRequest
+import com.senacor.schnaufr.user.model.*
 import io.rsocket.*
 import io.rsocket.exceptions.ApplicationErrorException
 import io.rsocket.transport.netty.client.TcpClientTransport
@@ -25,9 +23,9 @@ class SchnauferSpek : Spek({
             database.createCollection("schnaufers").toMono().block()
         }
 
-        val schnauferRepository = SchnauferRepository(client)
+        val repository = SchnauferRepository(client)
 
-        val server = SchnauferServer(MessageHandler(schnauferRepository))
+        val server = SchnauferServer(MessageHandler(repository))
 
         before {
             server.start()
@@ -60,7 +58,7 @@ class SchnauferSpek : Spek({
                         displayName = "screenSchnaufer"
                 )
 
-                schnauferRepository.create(schnaufer).block()
+                repository.create(schnaufer).block()
 
                 val schnauferByIdRequest = SchnauferByIdRequest(schnaufer.id)
 
@@ -89,7 +87,7 @@ class SchnauferSpek : Spek({
                         displayName = "Heinzi"
                 )
 
-                schnauferRepository.create(schnaufer).block()
+                repository.create(schnaufer).block()
 
                 val schnauferByUsernameRequest = SchnauferByUsernameRequest(schnaufer.username)
 
@@ -108,5 +106,22 @@ class SchnauferSpek : Spek({
             }
         }
 
+        context("when an avatar is requested by schauferId") {
+
+            it("returns an avatar") {
+                val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
+                val schnauferId = UUID()
+                repository.saveAvatar(schnauferId = schnauferId, data = file).block()
+
+
+                val requestPayload = DefaultPayload.create(AvatarBySchnauferIdRequest(schnauferId).toJson(), """{"operation": "findAvatar"}""")
+                val response = rSocket.requestStream(requestPayload)
+                    .map { it.data.convertToByteArray(512000) }
+                    .reduce(ByteArray(0)) { arr1, arr2 -> arr1.plus(arr2) }
+                    .block()!!
+
+                expectThat(response.size).isEqualTo(989664)
+            }
+        }
     }
 })

@@ -29,15 +29,17 @@ class SchnauferRepositorySpek : Spek({
         }
 
         it("can read avatars") {
-
-            val stream = this::class.java.getResource("/avatars/avatar_moni.jpg").openStream()
+            val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
             val schnauferId = UUID()
-            sut.saveAvatar(schnauferId = schnauferId, data = stream).block()
+            sut.saveAvatar(schnauferId = schnauferId, data = file).block()
 
-            val gridFSFile = sut.readAvatar(schnauferId).block()
+            val result = sut.readAvatar(schnauferId)
+                .doOnNext { println("dshahfashdfsj" + it.size) }
+                .reduce(ByteArray(0)) { arr1, arr2 -> arr1.plus(arr2) }
+                .block()!!
 
-            expectThat(gridFSFile?.filename).isEqualTo("avatar")
-            expectThat(gridFSFile?.metadata).isNotNull().hasEntry("schnauferId", schnauferId)
+            expectThat(result.size).isEqualTo(989664)
+
         }
 
     }

@@ -15,7 +15,7 @@ class LoginContainer extends Component {
     const {rSocketClient} = this.props
     try {
       const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
-      this.props.onLoginSuccess(result.data.id)
+      this.props.onLoginSuccess(result.data)
     } catch (e) {
       this.props.addNotification(`error while trying to retrieve user: ${e}`)
     }

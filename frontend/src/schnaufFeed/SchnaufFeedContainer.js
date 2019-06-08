@@ -18,7 +18,6 @@ class SchnaufFeedContainer extends Component {
   }
 
   onNext = (schnauf) => {
-    console.log(`on next: ${schnauf}`)
     this.setState((prevState) => ({
       ...prevState,
       loading: false,
@@ -26,8 +25,7 @@ class SchnaufFeedContainer extends Component {
     }))
   }
 
-  onError = (error) => {
-    console.log(`on error: ${error}`)
+  onError = () => {
     this.setState((prevState) => ({
       ...prevState,
       loading: false
@@ -42,7 +40,7 @@ class SchnaufFeedContainer extends Component {
   componentDidMount() {
     const {rSocketClient} = this.props
     const requestSize = 10
-    const requestData = {data: {}, metadata: { operation: 'getAllSchnaufs' }}
+    const requestData = {data: {}, metadata: {operation: 'getAllSchnaufsAndWatch'}}
 
     this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{
       onNext: this.onNext,

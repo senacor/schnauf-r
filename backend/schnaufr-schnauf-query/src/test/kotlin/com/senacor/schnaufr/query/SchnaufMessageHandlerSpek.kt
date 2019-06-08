@@ -1,9 +1,6 @@
 package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
-import com.senacor.schnaufr.query.SchnaufClient
-import com.senacor.schnaufr.query.SchnaufMessageHandler
-import com.senacor.schnaufr.query.SchnauferClient
 import com.senacor.schnaufr.query.model.MetaData
 import com.senacor.schnaufr.query.model.Schnauf
 import com.senacor.schnaufr.query.model.SchnaufFeedEntry
@@ -13,9 +10,11 @@ import io.mockk.mockk
 import io.rsocket.util.DefaultPayload
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import reactor.core.publisher.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import strikt.api.expectThat
-import strikt.assertions.*
+import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
 
 class SchnaufMessageHandlerSpek : Spek({
     val schnaufId = UUID()
@@ -27,14 +26,14 @@ class SchnaufMessageHandlerSpek : Spek({
 
     describe("schnauf message handler") {
         val mockedSchnaufClient = mockk<SchnaufClient>()
-        every { mockedSchnaufClient.getAllSchnaufs() } returns Flux.just(Schnauf(schnaufId, authorId, title))
+        every { mockedSchnaufClient.getAllSchnaufs(any()) } returns Flux.just(Schnauf(schnaufId, authorId, title))
         val mockedSchnaufrClient =  mockk<SchnauferClient>()
         every { mockedSchnaufrClient.getSchnaufrById(authorId) } returns Mono.just(Schnaufr(authorId, avatarId, username, displayName))
         val sut = SchnaufMessageHandler(mockedSchnaufClient, mockedSchnaufrClient)
 
 
         it("returns an aggregated stream of schnauf feed entries") {
-            val entries = sut.requestStream(DefaultPayload.create("", MetaData("getAllSchnaufs").toJson())).toIterable().iterator()
+            val entries = sut.requestStream(DefaultPayload.create("", MetaData("getAllSchnaufs", -1, java.util.UUID.randomUUID()).toJson())).toIterable().iterator()
 
             expectThat(entries.hasNext())
             val entry = SchnaufFeedEntry.fromJson(entries.next().dataUtf8)

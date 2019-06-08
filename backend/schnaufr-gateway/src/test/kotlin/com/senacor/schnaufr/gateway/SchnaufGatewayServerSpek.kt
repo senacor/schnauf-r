@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.rsocket.RSocketFactory
 import io.rsocket.transport.netty.client.TcpClientTransport
+import io.rsocket.transport.netty.client.WebsocketClientTransport
 import io.rsocket.util.DefaultPayload
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -28,7 +29,7 @@ class SchnaufGatewayServerSpek : Spek({
         it("can respond") {
             val rsSocket = RSocketFactory
                     .connect()
-                    .transport(TcpClientTransport.create(8080))
+                    .transport(WebsocketClientTransport.create(8080))
                     .start()
                     .block()!!
 

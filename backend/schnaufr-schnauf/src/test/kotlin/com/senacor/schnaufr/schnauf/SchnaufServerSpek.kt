@@ -31,7 +31,6 @@ class SchnaufSpek : Spek({
         val server by memoized { SchnaufServer(messageHandler, PORT) }
         lateinit var rSocket: RSocket
 
-
         fun createSchnauf(title: String, submitter: UUID, recipients: List<UUID> = listOf()): Schnauf {
             val schnaufRequest = CreateSchnaufRequest(title, submitter, recipients)
             val createPayload = DefaultPayload.create(schnaufRequest.toJson(), """{"operation": "createSchnauf"}""")
@@ -84,7 +83,7 @@ class SchnaufSpek : Spek({
                 expectThat(createdSchnauf.submitter).isEqualTo(submitter)
 
                 await().atMost(5, TimeUnit.SECONDS).until {
-                    schnaufRepository.readLatest().collectList().block()!!.isNotEmpty()
+                    schnaufRepository.readLatest(limit = 10).collectList().block()!!.isNotEmpty()
                 }
             }
         }
@@ -99,10 +98,14 @@ class SchnaufSpek : Spek({
             }
 
             it("should retrieve all former schnaufs once") {
-                // create a schnauf
-                val title = "first-schnauf"
-                val submitter = UUID()
-                createSchnauf(title, submitter)
+                // create a few schnaufs
+                val title1 = "first-schnauf"
+                val submitter1 = UUID()
+                createSchnauf(title1, submitter1)
+
+                val title2 = "second-schnauf"
+                val submitter2 = UUID()
+                createSchnauf(title2, submitter2)
 
                 // get all schnaufs
                 val getAllPayload = DefaultPayload.create("", """{"operation": "getAllSchnaufs"}""")
@@ -112,7 +115,11 @@ class SchnaufSpek : Spek({
                         .thenAwait()
                         .expectNextMatches {
                             val schnauf = Schnauf.fromPayload(it)
-                            schnauf.submitter == submitter && schnauf.title == title
+                            schnauf.submitter == submitter2 && schnauf.title == title2
+                        }
+                        .expectNextMatches {
+                            val schnauf = Schnauf.fromPayload(it)
+                            schnauf.submitter == submitter1 && schnauf.title == title1
                         }
                         .expectComplete()
                         .verify()

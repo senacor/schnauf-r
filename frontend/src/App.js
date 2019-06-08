@@ -21,11 +21,11 @@ class App extends Component {
     isLoggedIn : false,
   }
 
-  onLoginSuccess = (userId, {history}) => {
+  onLoginSuccess = (user, {history}) => {
     this.setState((prevState) => ({
       ... prevState,
       isLoggedIn: true,
-      userId
+      userId: user.id
     }))
 
     history.push(PATH.FEED)

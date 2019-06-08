@@ -35,11 +35,12 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
 
     override fun requestStream(payload: Payload): Flux<Payload> {
         val principal = payload.principal
+        val limit = payload.limit ?: 10
 
         return when (payload.operation) {
             GET_ALL_SCHNAUFS ->
                 schnaufRepository
-                        .readLatest(principal = principal)
+                        .readLatest(principal = principal, limit = limit)
                         .map { it.asPayload() }
 
 
@@ -51,7 +52,7 @@ class MessageHandler(private val schnaufRepository: SchnaufRepository) : Abstrac
 
             GET_ALL_SCHNAUFS_AND_WATCH ->
                 schnaufRepository
-                        .readLatest(principal = principal)
+                        .readLatest(principal = principal, limit = limit)
                         .concatWith(
                                 schnaufRepository
                                         .watch(principal)
