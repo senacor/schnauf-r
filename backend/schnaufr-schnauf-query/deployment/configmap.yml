@@ -1,0 +1,12 @@
+#jinja2: variable_start_string:'${', variable_end_string:'}', trim_blocks: True
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schnauf-query-config
+data:
+  APPLICATION_PORT: "8080"
+  SCHNAUF_COMMAND_HOST: "localhost"
+  SCHNAUF_COMMAND_PORT: "8080"
+  SCHNAUFR_HOST: "localhost"
+  SCHNAUFR_PORT: "8080"
+

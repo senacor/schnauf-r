@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './index.scss'
+import Application from './App';
 
-import Schnauf from './Schnauf';
+const renderApplication = () => {
+  ReactDOM.render(<Application/>, document.getElementById('app'));
+};
 
-ReactDOM.render(<Schnauf reason={'react'}/>, document.getElementById('app'));
+renderApplication();

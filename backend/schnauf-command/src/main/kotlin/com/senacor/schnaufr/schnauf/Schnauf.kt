@@ -1,23 +1,23 @@
 package com.senacor.schnaufr.schnauf
 
-import com.senacor.schnaufr.serialization.JsonSerializer
-import com.senacor.schnaufr.UUID
+import com.senacor.schnaufr.*
 import com.senacor.schnaufr.model.CreateSchnaufRequest
-import io.rsocket.kotlin.DefaultPayload
-import io.rsocket.kotlin.Payload
-import java.util.*
+import com.senacor.schnaufr.serialization.JsonSerializer
+import io.rsocket.Payload
+import io.rsocket.util.DefaultPayload
+import java.util.UUID
 
-data class Schnauf(val id: UUID, val title: String, val submitter: String) {
+data class Schnauf(val id: UUID, val title: String, val submitter: UUID, val recipients: List<UUID> = listOf()) {
 
     companion object {
-        fun fromRequest(request: CreateSchnaufRequest): Schnauf = Schnauf(UUID(), request.title, request.submitter)
-        fun fromJson(value: String): Schnauf = JsonSerializer.fromJson(value)
+        fun fromRequest(request: CreateSchnaufRequest): Schnauf = Schnauf(UUID(), request.title, request.submitter, request.recipients)
+        private fun fromJson(value: String): Schnauf = JsonSerializer.fromJson(value)
         fun fromPayload(payload: Payload): Schnauf = fromJson(payload.dataUtf8)
     }
 
-    fun toJson(): String = JsonSerializer.toJsonString(this)
+    private fun toJson(): String = JsonSerializer.toJsonString(this)
 
     fun asPayload(): Payload {
-        return DefaultPayload.text(toJson())
+        return DefaultPayload.create(toJson())
     }
 }

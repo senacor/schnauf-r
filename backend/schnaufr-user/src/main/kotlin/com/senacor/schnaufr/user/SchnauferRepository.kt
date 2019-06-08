@@ -5,6 +5,7 @@ import com.mongodb.client.gridfs.model.*
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.gridfs.AsyncOutputStream
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
+import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncOutputStream
 import org.bson.Document
@@ -15,7 +16,9 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.*
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.nio.ByteBuffer
 import java.util.UUID
+import java.util.stream.Stream
 
 class SchnauferRepository(private val client: MongoClient) {
 
@@ -56,14 +59,28 @@ class SchnauferRepository(private val client: MongoClient) {
             .map { it.toString() }
     }
 
-    fun readAvatar(schnauferId: UUID, asyncOutputStream: AsyncOutputStream): Flux<Long> {
+    fun readAvatar(schnauferId: UUID): Flux<ByteArray> {
 
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
-        return bucket.find(whereQuery).toMono().flatMapMany {
-            bucket.downloadToStream(it.objectId, asyncOutputStream)
-        }.flatMap {
+        val chunkSize = 512000
+
+        return bucket.find(whereQuery).toMono().map {gridFSFile ->
+            bucket.openDownloadStream(gridFSFile.objectId)
+        }.flatMapMany {downLoadStream ->
+            Stream.generate {
+                ByteBuffer.allocate(chunkSize)}
+                .toFlux()
+                .flatMap { buffer ->
+                    Mono.from(downLoadStream.read(buffer))
+                        .map { buffer }
+                }
+                .map { it.array() }
+                .takeWhile { chunk -> chunk.size < chunkSize }
+                .doOnComplete {
+
+                }
 
         }
     }

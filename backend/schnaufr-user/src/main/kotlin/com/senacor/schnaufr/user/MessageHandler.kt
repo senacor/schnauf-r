@@ -5,8 +5,7 @@ import com.senacor.schnaufr.operation
 import io.rsocket.*
 import io.rsocket.util.DefaultPayload
 import org.slf4j.*
-import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.core.publisher.*
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
@@ -34,17 +33,23 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
                         .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
                 }
             }
+            else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
+        }
+    }
+
+    override fun requestStream(payload: Payload): Flux<Payload> {
+        logger.info("received payload '{}' with metadata '{}'", payload.dataUtf8, payload.metadataUtf8)
+
+        return when (payload.operation) {
             "readAvatar" -> {
                 val schnauferId = UUID.fromString(payload.dataUtf8)
-                Mono.defer {
-                    val bos = ByteArrayOutputStream()
-                    val asyncOS = toAsyncOutputStream(bos)
-                    repository.readAvatar(schnauferId, asyncOS)
-                        .map { DefaultPayload.create(bos.toByteArray()) }
+                Flux.defer {
+                    repository.readAvatar(schnauferId)
+                        .map { DefaultPayload.create(it) }
                         .switchIfEmpty(Mono.error<Payload>(RuntimeException("noAvatarForSchnauferIdFound")))
                 }
             }
-            else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
+            else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }
     }
 }

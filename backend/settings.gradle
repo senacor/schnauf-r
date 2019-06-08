@@ -1,0 +1,9 @@
+rootProject.name = 'schnaufr-backend'
+
+include 'schnaufr-commons'
+include 'schnaufr-commons-test'
+include 'schnaufr-user'
+include 'schnauf-command'
+include 'schnaufr-schnauf-query'
+
+
