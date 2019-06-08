@@ -40,7 +40,7 @@ object Bootstrap {
             logger.info("Creating initial users")
             DefaultSchnaufer.allSchnaufer.map {
                 schnauferRepository.create(it).block()
-                schnauferRepository.saveAvatar(avatarId = it.avatarId, data = Bootstrap::class.java.getResourceAsStream("/avatars/avatar_moni")).block()
+                schnauferRepository.saveAvatar(avatarId = it.avatarId, data = Bootstrap::class.java.getResourceAsStream("/avatars/${it.username}")).block()
             }
             logger.info("Created initial users")
             Thread.currentThread().join()

@@ -109,7 +109,7 @@ class SchnauferSpek : Spek({
         context("when an avatar is requested by id") {
 
             it("returns an avatar") {
-                val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/avatar_moni.jpg")
+                val file = SchnauferRepository::class.java.getResourceAsStream("/avatars/ohmannnnnn.jpg")
                 val avatarId = UUID()
                 repository.saveAvatar(avatarId = avatarId, data = file).block()
 
