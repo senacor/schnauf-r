@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {Spinner, Row} from 'react-bootstrap';
 import SchnaufFeed from './SchnaufFeed';
-import createRequestStreamClient from '../requestStreamClient'
-import createRSocket from '../rSocketClient'
+import createRSocketClient from '../rsocket/rSocketClient'
 import {withNotification} from '../NotificationProvider';
 import PropTypes from 'prop-types';
 
@@ -40,9 +39,8 @@ class SchnaufFeedContainer extends Component {
 
   componentDidMount = async () => {
     try {
-      const socket = await createRSocket({url: 'ws://127.0.0.1:8080'})
-      const subscribe = await createRequestStreamClient(1)(socket)
-      this.unsubscribe = subscribe({
+      const { subscribeRequestStream } = await createRSocketClient('ws://127.0.0.1:8080')
+      this.unsubscribe = subscribeRequestStream({
         onNext: this.onNext,
         onError: this.onError,
         onLimitReached: this.onLimitReached,
