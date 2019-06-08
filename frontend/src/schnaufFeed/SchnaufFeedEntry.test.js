@@ -1,7 +1,6 @@
 import React from 'react'
 import {shallow} from 'enzyme'
-
-import { Card, Image, Row , Col} from 'react-bootstrap'
+import { Card} from 'react-bootstrap'
 import SchnaufFeedEntry from './SchnaufFeedEntry'
 
 describe('Schnauf', () => {

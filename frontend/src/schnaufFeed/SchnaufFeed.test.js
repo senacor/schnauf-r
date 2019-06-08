@@ -1,7 +1,5 @@
 import React from 'react'
 import {shallow} from 'enzyme'
-
-import { Card, Image, Row , Col} from 'react-bootstrap'
 import SchnaufFeed from './SchnaufFeed'
 import SchnaufFeedEntry from './SchnaufFeedEntry';
 

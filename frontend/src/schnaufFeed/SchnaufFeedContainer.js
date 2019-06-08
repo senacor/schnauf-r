@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import {Spinner, Row, Alert} from 'react-bootstrap';
+import {Spinner, Row} from 'react-bootstrap';
 import SchnaufFeed from './SchnaufFeed';
 import createRequestStreamClient from '../requestStreamClient'
 import createRSocket from '../rSocketClient'
-import {withNotification} from '../NotificationContext';
+import {withNotification} from '../NotificationProvider';
+import PropTypes from 'prop-types';
 
 class SchnaufFeedContainer extends Component {
 
@@ -25,8 +26,9 @@ class SchnaufFeedContainer extends Component {
     }));
   }
 
-  onError = (error) => {
+  onError = () => {
     this.setState((prevState) => ({
+      ...prevState,
       loading: false
     }));
     this.props.addNotification('Fehler beim Laden');
@@ -68,5 +70,9 @@ class SchnaufFeedContainer extends Component {
   }
 
 }
+
+SchnaufFeedContainer.propTypes = {
+  addNotification: PropTypes.func.isRequired // injected by withNotification
+};
 
 export default withNotification(SchnaufFeedContainer);
