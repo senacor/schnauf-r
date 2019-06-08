@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: schnauf-query
+  name: schnaufr-query
+  namespace: schnaufr-query
   labels:
-    app: schnauf-query
+    app: schnaufr-query
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -13,18 +14,18 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: schnauf-query
+      app: schnaufr-query
   template:
     metadata:
       labels:
-        app: schnauf-query
+        app: schnaufr-query
     spec:
       imagePullSecrets:
         - name: artifactory
       containers:
-        - name: schnauf-query
+        - name: schnaufr-query
           imagePullPolicy: Always
-          image: gcr.io/main-stack-241307/schnauf-query
+          image: gcr.io/main-stack-241307/schnaufr-query
           resources:
             limits:
               cpu: 500m
@@ -34,7 +35,7 @@ spec:
               memory: 200Mi
           envFrom:
             - configMapRef:
-                name: schnauf-query-config
+                name: schnaufr-query-config
           ports:
             - name: tcp-app
               containerPort: 8080

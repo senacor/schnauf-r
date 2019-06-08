@@ -1,31 +1,31 @@
-const createSubscription = (flowable, {onNext, onError, onLimitReached}, requestSize) => {
-  let subscription = null;
-  let subscriptionCounter = 0;
+const createSubscription = (flowable,requestSize, {onNext, onError, onLimitReached}) => {
+  let subscription = null
+  let subscriptionCounter = 0
 
   flowable.subscribe({
     onNext: (response) => {
-      subscriptionCounter++;
+      subscriptionCounter++
       if (subscriptionCounter >= requestSize) {
-        subscriptionCounter = 0;
-        onLimitReached(() => subscription.request(requestSize));
+        subscriptionCounter = 0
+        onLimitReached(() => subscription.request(requestSize))
       }
-      onNext(response.data);
+      onNext(response.data)
     },
     onError: onError,
     onSubscribe: (sub) => {
-      subscription = sub;
+      subscription = sub
       sub.request(requestSize)
     }
-  });
+  })
 
-  return  subscription.cancel;
-};
+  return  subscription.cancel
+}
 
 const createRequestStreamSubscriber =  (socket) => {
   return (requestData, requestSize, callbacks) => {
-    const flowable = socket.requestStream(requestData);
-    return createSubscription(flowable, callbacks, requestSize);
-  };
+    const flowable = socket.requestStream(requestData)
+    return createSubscription(flowable,requestSize, callbacks)
+  }
 }
 
 export default createRequestStreamSubscriber

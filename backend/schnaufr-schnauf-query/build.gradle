@@ -17,7 +17,7 @@ jib {
         ]
     }
     to {
-        image = "gcr.io/main-stack-241307/schnauf-query:latest"
+        image = "gcr.io/main-stack-241307/schnaufr-query:latest"
         auth {
             username = '_json_key'
             password = file('../keyfile.json').text

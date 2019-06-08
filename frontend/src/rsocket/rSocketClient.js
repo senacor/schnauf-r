@@ -1,13 +1,11 @@
-import createRSocket from './rSocket';
-import requestResponse from './requestReponse';
-import requestStreamSubscriber from './requestStreamSubscriber';
-const createRSocketClient = async (url) => {
-  const socket = await createRSocket(url);
+import requestResponse from './requestResponse'
+import requestStreamSubscriber from './requestStreamSubscriber'
 
+const createRSocketClient =  (rSocket) => {
   return {
-    requestResponse : requestResponse(socket),
-    subscribeRequestStream: requestStreamSubscriber(socket),
-  };
+    requestResponse : requestResponse(rSocket),
+    subscribeRequestStream: requestStreamSubscriber(rSocket),
+  }
 }
 
-export default createRSocketClient;
+export default createRSocketClient

@@ -1,12 +1,12 @@
 import React from 'react'
 import { ListGroup, ListGroupItem } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import SchnaufFeedEntry from './SchnaufFeedEntry';
+import SchnaufFeedEntry from './SchnaufFeedEntry'
 
 const SchnaufFeed = ({schnaufs}) => {
 
   if (!schnaufs.length) {
-    return (<div>Keine Schnaufs</div>);
+    return (<div>Keine Schnaufs</div>)
   }
 
   const schnaufEntries = schnaufs.map((schnauf) =>
@@ -19,6 +19,6 @@ const SchnaufFeed = ({schnaufs}) => {
 
 SchnaufFeed.propTypes = {
   schnaufs: PropTypes.array.isRequired
-};
+}
 
-export default SchnaufFeed;
+export default SchnaufFeed

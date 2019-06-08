@@ -6,5 +6,6 @@ include 'schnaufr-user'
 include 'schnaufr-schnauf'
 include 'schnaufr-location'
 include 'schnaufr-schnauf-query'
+include 'schnaufr-gateway'
 
 

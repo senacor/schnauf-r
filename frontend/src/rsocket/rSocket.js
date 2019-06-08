@@ -1,7 +1,7 @@
-import {JsonSerializers, RSocketClient} from 'rsocket-core';
-import RSocketWebSocketClient from 'rsocket-websocket-client';
+import {JsonSerializers, RSocketClient} from 'rsocket-core'
+import RSocketWebSocketClient from 'rsocket-websocket-client'
 
-const createRSocket = ({url}) => {
+const createRSocket = (url, {onComplete, onError}) => {
   const rSocketClient = new RSocketClient({
     serializers: JsonSerializers,
     setup: {
@@ -15,13 +15,12 @@ const createRSocket = ({url}) => {
     transport: new RSocketWebSocketClient({url, debug: true })
   })
 
-  return new Promise((resolve, reject) => {
-    rSocketClient.connect().subscribe({
-      onComplete: resolve,
-      onError: reject,
-      onSubscribe: () => console.log(`subscribed to ${url}`),
-    });
+  rSocketClient.connect().subscribe({
+    onComplete: onComplete,
+    onError: onError,
+    onSubscribe: () => console.log(`subscribed to ${url}`),
   })
+
 }
 
-export default createRSocket;
+export default createRSocket

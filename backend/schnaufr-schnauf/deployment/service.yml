@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     app: schnaufr-schnauf
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: tcp-app
       port: 8080

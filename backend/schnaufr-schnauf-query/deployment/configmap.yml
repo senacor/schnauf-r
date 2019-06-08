@@ -2,11 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: schnauf-query-config
+  name: schnaufr-query-config
+  namespace: schnaufr-query
 data:
   APPLICATION_PORT: "8080"
   SCHNAUF_COMMAND_HOST: "schnaufr-schnauf.schnaufr-schnauf"
   SCHNAUF_COMMAND_PORT: "8080"
-  SCHNAUFR_HOST: "schnauf-user"
+  SCHNAUFR_HOST: "schnaufr-user.schnaufr-user"
   SCHNAUFR_PORT: "8080"
 

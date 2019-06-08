@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: schnaufr-gateway
+  namespace: schnaufr-gateway
+spec:
+  selector:
+    app: schnaufr-gateway
+  type: LoadBalancer
+  ports:
+    - name: tcp-app
+      port: 8080
+      targetPort: 8080
+  loadBalancerIP: 35.246.79.96 # gcloud compute addresses create schnaufr --region europe-west2

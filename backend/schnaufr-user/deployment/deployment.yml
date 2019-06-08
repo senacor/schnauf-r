@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: schnauf-user
+  name: schnaufr-user
+  namespace: schnaufr-user
   labels:
-    app: schnauf-user
+    app: schnaufr-user
 spec:
   replicas: 1
   revisionHistoryLimit: 5
@@ -13,17 +14,17 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: schnauf-user
+      app: schnaufr-user
   template:
     metadata:
       labels:
-        app: schnauf-user
+        app: schnaufr-user
     spec:
       imagePullSecrets:
         - name: artifactory
       containers:
-        - name: schnauf-user
-          image: gcr.io/main-stack-241307/schnauf-user
+        - name: schnaufr-user
+          image: gcr.io/main-stack-241307/schnaufr-user
           resources:
             limits:
               cpu: 500m
@@ -36,7 +37,7 @@ spec:
               containerPort: 8080
           envFrom:
             - configMapRef:
-                name: schnauf-user-config
+                name: schnaufr-user-config
           terminationMessagePath: /dev/stdout
         - name: mongo
           image: mongo:3.6-xenial

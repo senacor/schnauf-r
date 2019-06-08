@@ -1,6 +1,9 @@
 package com.senacor.schnaufr
 
-import com.senacor.schnaufr.schnauf.query.*
+import com.senacor.schnaufr.query.SchnaufClient
+import com.senacor.schnaufr.query.SchnaufMessageHandler
+import com.senacor.schnaufr.query.SchnaufQueryServer
+import com.senacor.schnaufr.query.SchnauferClient
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
@@ -16,11 +19,11 @@ object Bootstrap {
         val schnauferClient = SchnauferClient()
 
         val server = SchnaufQueryServer(
-            messageHandler = SchnaufMessageHandler(
-                schnaufClient,
-                schnauferClient
-            ),
-            port = System.getenv("APPLICATION_PORT")?.toInt() ?: 8080
+                messageHandler = SchnaufMessageHandler(
+                        schnaufClient,
+                        schnauferClient
+                ),
+                port = System.getenv("APPLICATION_PORT")?.toInt() ?: 8080
         )
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
