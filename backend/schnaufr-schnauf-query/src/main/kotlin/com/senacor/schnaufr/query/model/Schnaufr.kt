@@ -1,4 +1,4 @@
-package com.senacor.schnaufr.gateway.model
+package com.senacor.schnaufr.query.model
 
 import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.serialization.JsonSerializer

@@ -18,11 +18,11 @@ class SchnaufGatewayMessageHandler(
         val logger: Logger = LoggerFactory.getLogger(SchnaufGatewayServer::class.java)
         // Schnauf-command
         const val CREATE_SCHNAUF = "createSchnauf" // request-response
-        const val WATCH_SCHNAUFS = "watchSchnaufs" // request-stream
-        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch" // request-stream
 
         // Schnauf-Query
         const val GET_ALL_SCHNAUFS = "getAllSchnaufs" // request-stream
+        const val WATCH_SCHNAUFS = "watchSchnaufs" // request-stream
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch" // request-stream
 
         // Schnauf-User
         const val FIND_USER_BY_USERNAME = "findUserByUsername" // request-response
@@ -42,8 +42,8 @@ class SchnaufGatewayMessageHandler(
     override fun requestStream(payload: Payload): Flux<Payload> {
         logger.info("Received request-stream request ${payload.operation}")
         return when (payload.operation) {
-            WATCH_SCHNAUFS -> schnaufCommandClient.rsocket.flatMapMany { it.requestStream(payload) }
-            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufCommandClient.rsocket.flatMapMany { it.requestStream(payload) }
+            WATCH_SCHNAUFS -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
+            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
             GET_ALL_SCHNAUFS -> schnaufQueryClient.rsocket.flatMapMany { it.requestStream(payload) }
             else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }

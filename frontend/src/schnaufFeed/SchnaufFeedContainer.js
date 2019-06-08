@@ -39,7 +39,7 @@ class SchnaufFeedContainer extends Component {
 
   componentDidMount() {
     const {rSocketClient} = this.props
-    const requestSize = 10000
+    const requestSize = 10
     const requestData = {data: {}, metadata: {operation: 'getAllSchnaufsAndWatch'}}
 
     this.unsubscribe = rSocketClient.subscribeRequestStream(requestData, requestSize,{

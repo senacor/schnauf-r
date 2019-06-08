@@ -1,10 +1,10 @@
-package com.senacor.schnaufr.gateway
+package com.senacor.schnaufr.query
 
 import com.senacor.schnaufr.UUID
 import com.senacor.schnaufr.operation
-import com.senacor.schnaufr.gateway.model.Author
-import com.senacor.schnaufr.gateway.model.Schnauf
-import com.senacor.schnaufr.gateway.model.SchnaufFeedEntry
+import com.senacor.schnaufr.query.model.Author
+import com.senacor.schnaufr.query.model.Schnauf
+import com.senacor.schnaufr.query.model.SchnaufFeedEntry
 import io.rsocket.AbstractRSocket
 import io.rsocket.Payload
 import org.slf4j.Logger
@@ -17,12 +17,23 @@ class SchnaufMessageHandler(val schnaufClient: SchnaufClient, val schnauferClien
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
         const val GET_ALL_SCHNAUFS = "getAllSchnaufs"
+        const val WATCH_SCHNAUFS = "watchSchnaufs"
+        const val GET_ALL_SCHNAUFS_AND_WATCH = "getAllSchnaufsAndWatch"
+
     }
     override fun requestStream(payload: Payload): Flux<Payload> {
         return when (payload.operation) {
             GET_ALL_SCHNAUFS -> schnaufClient.getAllSchnaufs()
                     .flatMap { enrichWithSchnaufrInformation(it) }
                     .map { it.asPayload() }
+
+            WATCH_SCHNAUFS -> schnaufClient.watchAllSchnaufs()
+                    .flatMap { enrichWithSchnaufrInformation(it) }
+                    .map { it.asPayload()}
+
+            GET_ALL_SCHNAUFS_AND_WATCH -> schnaufClient.getAllSchnaufsAndWatch()
+                    .flatMap { enrichWithSchnaufrInformation(it) }
+                    .map { it.asPayload()}
 
             else -> return Flux.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))
         }

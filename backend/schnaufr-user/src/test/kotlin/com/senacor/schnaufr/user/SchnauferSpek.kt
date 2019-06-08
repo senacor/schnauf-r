@@ -1,6 +1,9 @@
 package com.senacor.schnaufr.user
 
 import com.senacor.schnaufr.*
+import com.senacor.schnaufr.user.model.Schnaufer
+import com.senacor.schnaufr.user.model.SchnauferByIdRequest
+import com.senacor.schnaufr.user.model.SchnauferByUsernameRequest
 import io.rsocket.*
 import io.rsocket.exceptions.ApplicationErrorException
 import io.rsocket.transport.netty.client.TcpClientTransport
@@ -39,7 +42,7 @@ class SchnauferSpek : Spek({
             factory = {
                 RSocketFactory
                     .connect()
-                    .transport(TcpClientTransport.create(9090))
+                    .transport(TcpClientTransport.create(8080))
                     .start()
                     .block()!!
             },
@@ -51,22 +54,24 @@ class SchnauferSpek : Spek({
             it("returns a schnaufer") {
 
                 val schnaufer = Schnaufer(
-                    id = UUID(),
-                    avatarId = UUID(),
-                    username = "schnauferusername",
-                    displayName = "screenSchnaufer"
+                        id = UUID(),
+                        avatarId = UUID(),
+                        username = "schnauferusername",
+                        displayName = "screenSchnaufer"
                 )
 
                 schnauferRepository.create(schnaufer).block()
 
-                val requestPayload = DefaultPayload.create(schnaufer.id.toString(), """{"operation": "findUserById"}""")
+                val schnauferByIdRequest = SchnauferByIdRequest(schnaufer.id)
+
+                val requestPayload = DefaultPayload.create(schnauferByIdRequest.toJson(), """{"operation": "findUserById"}""")
                 val response = rSocket.requestResponse(requestPayload).block()!!
                 val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
                 expectThat(foundSchnaufer).isEqualTo(schnaufer)
             }
 
             it("it return 'userNotFound' for unknown user") {
-                val findUserPayload = DefaultPayload.create(UUID().toString(), """{"operation": "findUserById"}""")
+                val findUserPayload = DefaultPayload.create(SchnauferByIdRequest(UUID()).toJson(), """{"operation": "findUserById"}""")
 
                 expectThrows<ApplicationErrorException> {
                     rSocket.requestResponse(findUserPayload).block()
@@ -78,22 +83,24 @@ class SchnauferSpek : Spek({
 
             it("returns a schnaufer") {
                 val schnaufer = Schnaufer(
-                    id = UUID(),
-                    avatarId = UUID(),
-                    username = "heinz",
-                    displayName = "Heinzi"
+                        id = UUID(),
+                        avatarId = UUID(),
+                        username = "heinz",
+                        displayName = "Heinzi"
                 )
 
                 schnauferRepository.create(schnaufer).block()
 
-                val requestPayload = DefaultPayload.create(schnaufer.username, """{"operation": "findUserByUsername"}""")
+                val schnauferByUsernameRequest = SchnauferByUsernameRequest(schnaufer.username)
+
+                val requestPayload = DefaultPayload.create(schnauferByUsernameRequest.toJson(), """{"operation": "findUserByUsername"}""")
                 val response = rSocket.requestResponse(requestPayload).block()!!
                 val foundSchnaufer = Schnaufer.fromJson(response.dataUtf8)
                 expectThat(foundSchnaufer).isEqualTo(schnaufer)
             }
 
             it("should return empty for unknown user") {
-                val findUserPayload = DefaultPayload.create("Hermann", """{"operation": "findUserByUsername"}""")
+                val findUserPayload = DefaultPayload.create(SchnauferByUsernameRequest("Hermann").toJson(), """{"operation": "findUserByUsername"}""")
 
                 expectThrows<ApplicationErrorException> {
                     rSocket.requestResponse(findUserPayload).block()

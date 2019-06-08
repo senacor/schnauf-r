@@ -5,6 +5,7 @@ import com.mongodb.client.gridfs.model.*
 import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
+import com.senacor.schnaufr.user.model.Schnaufer
 import org.bson.Document
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
@@ -13,7 +14,7 @@ import reactor.core.publisher.*
 import java.io.InputStream
 import java.util.UUID
 
-class SchnauferRepository(private val client: MongoClient) {
+class  SchnauferRepository(private val client: MongoClient) {
 
     companion object {
         val logger = LoggerFactory.getLogger(SchnauferRepository::class.java)

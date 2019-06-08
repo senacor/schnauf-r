@@ -1,14 +1,14 @@
-package com.senacor.schnaufr.gateway.model
+package com.senacor.schnaufr.query.model
 
 import com.senacor.schnaufr.serialization.JsonSerializer
 import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
 import java.util.UUID
 
-// author: User / ID and probably geoloaction or something like that
-data class Schnauf(val id: UUID, val submitter: UUID, val title: String) {
+data class SchnaufFeedEntry(val id: UUID, val title: String, val author: Author) {
+
     companion object {
-        fun fromJson(value: String): Schnauf = JsonSerializer.fromJson(value)
+        fun fromJson(value: String): SchnaufFeedEntry = JsonSerializer.fromJson(value)
     }
 
     fun toJson(): String = JsonSerializer.toJsonString(this)

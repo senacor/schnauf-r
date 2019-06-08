@@ -1,6 +1,6 @@
 package com.senacor.schnaufr
 
-import com.senacor.schnaufr.user.Schnaufer
+import com.senacor.schnaufr.user.model.Schnaufer
 
 object DefaultSchnaufer {
     private val blumeSchnaufer = Schnaufer(
@@ -30,8 +30,8 @@ object DefaultSchnaufer {
     private val holtkampSchnaufer = Schnaufer(
             java.util.UUID.fromString("c5d15563-5ac7-477d-95d6-783f7b0a729d"),
             java.util.UUID.fromString("87c29cfd-0faf-4241-8201-78f31af5ac59"),
-            "hildenblam",
-            "Hilde Blam"
+            "hatekamp",
+            "Jonas Holtkamp"
     )
     private val ohmanSchnaufer = Schnaufer(
             java.util.UUID.fromString("13898f8e-c5c1-4ed4-bb4d-e3c0725bea2a"),

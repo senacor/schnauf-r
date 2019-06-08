@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {withRSocketClient} from '../rsocket/RSocketClientProvider'
+import {withNotification} from '../NotificationProvider'
 import Login from './Login'
 
 class LoginContainer extends Component {
@@ -12,8 +13,12 @@ class LoginContainer extends Component {
 
   login = async (username) => {
     const {rSocketClient} = this.props
-    const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
-    this.props.onLoginSuccess(result.data)
+    try {
+      const result = await rSocketClient.requestResponse({ data: { username }, metadata: { operation: 'findUserByUsername' }})
+      this.props.onLoginSuccess(result.data)
+    } catch (e) {
+      this.props.addNotification(`error while trying to retrieve user: ${e}`)
+    }
   }
 
   render() {
@@ -26,8 +31,9 @@ class LoginContainer extends Component {
 
 LoginContainer.propTypes = {
   onLoginSuccess: PropTypes.func.isRequired,
-  rSocketClient: PropTypes.object.isRequired,
+  addNotification: PropTypes.func.isRequired,  // injected by withNotification
+  rSocketClient: PropTypes.object.isRequired, // injected by withRSocketClient
 }
 
-export default withRSocketClient(LoginContainer)
+export default withNotification(withRSocketClient(LoginContainer))
 
