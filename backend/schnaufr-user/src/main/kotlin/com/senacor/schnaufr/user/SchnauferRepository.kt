@@ -65,7 +65,7 @@ class SchnauferRepository(private val client: MongoClient) {
     fun readAvatar(schnauferId: UUID): Flux<ByteArray> {
 
         val whereQuery = BasicDBObject()
-        whereQuery["metadata.schnauferId"] = schnauferId
+        whereQuery["metadata.avatarId"] = schnauferId
 
         val chunkSize = 512000
 
