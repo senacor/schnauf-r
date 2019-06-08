@@ -1,10 +1,13 @@
 package com.senacor.schnaufr.user
 
 import com.senacor.schnaufr.operation
+import com.senacor.schnaufr.serialization.JsonSerializer
 import com.senacor.schnaufr.user.model.SchnauferByIdRequest
 import com.senacor.schnaufr.user.model.SchnauferByUsernameRequest
 import io.rsocket.*
+import io.rsocket.util.DefaultPayload
 import org.slf4j.*
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.UUID
 
@@ -33,6 +36,14 @@ class MessageHandler(private val repository: SchnauferRepository) : AbstractRSoc
                     repository.read(id = schnauferByIdRequest.id)
                         .map { it.asPayload() }
                         .switchIfEmpty(Mono.error<Payload>(RuntimeException("userNotFound")))
+                }
+            }
+            "findAllUsers" -> {
+                Mono.defer {
+                    repository.readAllUsers()
+                            .collectList()
+                            .map { JsonSerializer.toJsonString(it) }
+                            .map { DefaultPayload.create(it) }
                 }
             }
             else -> return Mono.error(UnsupportedOperationException("unrecognized operation ${payload.operation}"))

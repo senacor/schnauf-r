@@ -42,6 +42,10 @@ class  SchnauferRepository(private val client: MongoClient) {
             .doOnSubscribe { logger.info("Looking up user with name '$userName' in MongoDB") }
     }
 
+    fun readAllUsers(): Flux<Schnaufer> {
+        return collection.find().toFlux()
+    }
+
     fun saveAvatar(schnauferId: UUID, data: InputStream): Mono<UUID> {
 
         val options = GridFSUploadOptions()
