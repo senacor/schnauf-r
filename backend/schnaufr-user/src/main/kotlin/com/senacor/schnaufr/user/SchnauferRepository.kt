@@ -7,12 +7,15 @@ import com.mongodb.reactivestreams.client.gridfs.GridFSBuckets
 import com.mongodb.reactivestreams.client.gridfs.helpers.AsyncStreamHelper.toAsyncInputStream
 import com.senacor.schnaufr.user.model.Schnaufer
 import org.bson.Document
+import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.*
 import java.io.InputStream
+import java.nio.ByteBuffer
 import java.util.UUID
+import java.util.stream.Stream
 
 class  SchnauferRepository(private val client: MongoClient) {
 
@@ -46,7 +49,7 @@ class  SchnauferRepository(private val client: MongoClient) {
         return collection.find().toFlux()
     }
 
-    fun saveAvatar(schnauferId: UUID, data: InputStream): Mono<UUID> {
+    fun saveAvatar(schnauferId: UUID, data: InputStream): Mono<ObjectId> {
 
         val options = GridFSUploadOptions()
             .chunkSizeBytes(1024 * 1024)
@@ -57,14 +60,36 @@ class  SchnauferRepository(private val client: MongoClient) {
             .doOnSuccess { logger.info("successfully uploaded avatar with id {}", schnauferId) }
             .doOnError { logger.error("failed to upload avatar with id {}", schnauferId, it) }
             .doFinally { streamToUpload.close() }
-            .map { UUID.fromString(it.toString()) }
     }
 
-    fun readAvatar(schnauferId: UUID): Mono<GridFSFile> {
+    fun readAvatar(schnauferId: UUID): Flux<ByteArray> {
 
         val whereQuery = BasicDBObject()
         whereQuery["metadata.schnauferId"] = schnauferId
 
+        val chunkSize = 512000
+
         return bucket.find(whereQuery).toMono()
+            .map { gridFSFile ->
+                bucket.openDownloadStream(gridFSFile.objectId)
+            }.flatMapMany { downLoadStream ->
+                Stream.generate { ByteBuffer.allocate(chunkSize) }
+                    .toFlux()
+                    .doOnNext { logger.debug("create empty buffer") }
+                    .flatMapSequential({ buffer ->
+                        downLoadStream.read(buffer).toMono()
+                            .doOnSuccess { logger.debug("populate buffer with $it bytes") }
+                            .map { bytesRead -> Pair(buffer, bytesRead) }
+                            .doOnSuccess { logger.debug("emit buffer") }
+                    }, 1)
+                    .takeUntil { buffer -> buffer.second == -1 }
+                    .map { buffer -> buffer.first.convertToByteArray(chunkSize) }.doOnNext { logger.info("buffer converted to array with size ${it.size}") }
+                    .doOnComplete {
+                        logger.debug("avatar stream completed")
+                    }
+
+            }
     }
+
 }
+
