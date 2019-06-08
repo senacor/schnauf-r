@@ -74,3 +74,20 @@ services:
       - SCHNAUF_COMMAND_PORT=8080
       - SCHNAUFR_HOST=schnauf-user
       - SCHNAUFR_PORT=9090
+
+  schnauf-gateway:
+    image: gcr.io/main-stack-241307/schnauf-gateway:latest
+    depends_on:
+      - schnaufr-schnauf
+      - schnauf-user
+      - schnauf-query
+    ports:
+      - 8085:8085
+    environment:
+      - APPLICATION_PORT=8085
+      - SCHNAUF_COMMAND_HOST=schnaufr-schnauf
+      - SCHNAUF_COMMAND_PORT=8080
+      - SCHNAUF_USER_HOST=schnauf-user
+      - SCHNAUF_USER_PORT=9090
+      - SCHNAUF_QUERY_HOST=schnauf-query
+      - SCHNAUF_QUERY_PORT=8090

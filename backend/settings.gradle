@@ -5,5 +5,6 @@ include 'schnaufr-commons-test'
 include 'schnaufr-user'
 include 'schnaufr-schnauf'
 include 'schnaufr-schnauf-query'
+include 'schnaufr-gateway'
 
 
